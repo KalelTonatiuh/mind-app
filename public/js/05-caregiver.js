@@ -99,4 +99,4 @@ function getAttachmentStyle() {
   return { name:'Insecure', desc:'mixed signals', color:'#888' };
 }
 
-const SOCIAL_CATS = new Set(['social','comfort','warmth','caregiver','separation','alone','rejected','praise','criticism','conflict','play']);
+const SOCIAL_CATS = new Set(['social','comfort','warmth','caregiver','separation','alone','rejected','praise','criticism','conflict','play','kindness','given trust','betrayal','humiliation','judged']);
