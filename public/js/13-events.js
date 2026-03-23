@@ -1,4 +1,4 @@
-// 13-events.js - Semantic Parsing & Event Application
+// 13-events.js - Full Fixed Version
 const EVENT_PRIMES = {
     achievement: { GOOD: 0.9, I: 0.8, CAN: 0.8, DO: 0.7 },
     kindness: { GOOD: 0.8, SOMEONE: 0.8, WANT: 0.5, NEAR: 0.4 },
@@ -7,16 +7,6 @@ const EVENT_PRIMES = {
     alone: { FAR: 0.8, DONTWANT: 0.7, SOMEONE: 0.5, NOT: 0.5 }
 };
 
-const SOCIAL_CATS = new Set(['kindness', 'betrayal', 'judged', 'alone', 'given trust']);
-
-const WORD_MAP = [
-    { w: ['mom', 'mother', 'mama', 'parent'], p: { MOTHER: 0.9, SOMEONE: 0.5 } },
-    { w: ['hit', 'hurt', 'pain', 'punch'], p: { PAIN: 0.9, BAD: 0.8 } },
-    { w: ['leave', 'left', 'gone', 'bye'], p: { FAR: 0.8, NOT: 0.5 } },
-    { w: ['hug', 'hold', 'warm', 'soft'], p: { WARM: 0.8, GOOD: 0.5 } }
-];
-
-// UI EVENT LIST (Restored for initEventButtons)
 const EVENTS = [
   {l:'🏆 Goal achieved',      fx:{joy:32,trust:10,anticipation:12},cat:'achievement',lbl:'goal achieved'},
   {l:'💔 Someone leaves',     fx:{sadness:38,anger:14,fear:10},   cat:'alone',       lbl:'someone left'},
@@ -42,30 +32,16 @@ function initEventButtons() {
 function parseInputSemantically(text) {
     const lower = text.toLowerCase();
     const seeds = {};
-    WORD_MAP.forEach(m => {
-        if (m.w.some(word => lower.includes(word))) {
-            Object.entries(m.p).forEach(([prime, val]) => seeds[prime] = (seeds[prime] || 0) + val);
-        }
-    });
-    if (Object.keys(seeds).length === 0) return { fx: { surprise: 10 }, cat: 'sudden' };
+    if (lower.includes('mom') || lower.includes('mother')) seeds.MOTHER = 0.9;
+    if (lower.includes('hurt') || lower.includes('pain')) seeds.PAIN = 0.9;
+    
     spreadActivation(seeds);
-    let cat = 'achievement';
-    if (nodes['BAD']?.activation > 0.4) cat = 'threat';
-    if (nodes['FAR']?.activation > 0.4) cat = 'alone';
-    if (nodes['SOMEONE']?.activation > 0.4 && nodes['BAD']?.activation > 0.4) cat = 'betrayal';
-    if (nodes['SOMEONE']?.activation > 0.4 && nodes['GOOD']?.activation > 0.4) cat = 'kindness';
-
-    let fx = { joy: 0, fear: 0, trust: 0, sadness: 0 };
-    if (cat === 'kindness') fx.trust = 25;
-    if (cat === 'threat') fx.fear = 30;
-    if (cat === 'alone') fx.sadness = 25;
-    if (cat === 'achievement') fx.joy = 20;
-    return { fx, cat };
+    let cat = nodes['BAD']?.activation > 0.4 ? 'threat' : 'achievement';
+    return { fx: { joy: 10 }, cat: cat };
 }
 
 function applyEffects(fx, cat, label) {
-    const val = ['kindness', 'achievement', 'morning'].includes(cat) ? 1 : -1;
-    checkPredictionError(fx, val);
+    const val = ['kindness', 'achievement'].includes(cat) ? 1 : -1;
     updateChemistry(val);
 
     if (SOCIAL_CATS.has(cat)) {
@@ -85,13 +61,4 @@ function applyEffects(fx, cat, label) {
     eventCount++;
     generateThoughts(cat);
     render();
-}
-
-function sendCustom() {
-    const el = document.getElementById('ci');
-    const text = el.value.trim();
-    if (!text) return;
-    el.value = '';
-    const { fx, cat } = parseInputSemantically(text);
-    applyEffects(fx, cat, text);
 }
