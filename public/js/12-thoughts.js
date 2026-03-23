@@ -127,17 +127,21 @@ function generateSpontaneousThoughts() {
 let thoughtQ=[],thoughtTimer=null;
 function sched(data,delay){thoughtQ.push({data,delay});if(!thoughtTimer)drain();}
 function drain(){if(!thoughtQ.length){thoughtTimer=null;return;}const item=thoughtQ.shift();thoughtTimer=setTimeout(()=>{push(item.data);drain();},item.delay);}
-function push({text,cls,tag,defKey,defColor}){
-  const stream=document.getElementById('stream');
-  const now=new Date();
-  const ts=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
-  const div=document.createElement('div');
-  div.className='thought'+(cls?` ${cls}`:'');
-  let inner=`<span class="ts">${ts}</span><span class="tx">${text}</span>`;
-  if(defKey)inner+=`<span class="dtag" style="background:${defColor}22;color:${defColor}">${defKey}</span>`;
-  div.innerHTML=inner;
-  stream.insertBefore(div,stream.firstChild);
-  while(stream.children.length>55)stream.removeChild(stream.lastChild);
+function push({text, cls, tag, defKey, defColor}) {
+  const stream = document.getElementById('stream');
+  const now = new Date();
+  const ts = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  
+  const div = document.createElement('div');
+  // cls will be 'nv', 'sem', 'mem', 'tom', 'need', or 'rum'
+  div.className = 'thought' + (cls ? ` ${cls}` : '');
+  
+  let inner = `<span class="ts">${ts}</span><span class="tx">${text}</span>`;
+  if (defKey) inner += `<span class="dtag" style="background:${defColor}22;color:${defColor}">${defKey}</span>`;
+  
+  div.innerHTML = inner;
+  stream.insertBefore(div, stream.firstChild);
+  while (stream.children.length > 55) stream.removeChild(stream.lastChild);
 }
 
 // ═══════════════════════════════════════════════════════
