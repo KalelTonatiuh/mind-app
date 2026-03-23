@@ -3,269 +3,298 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Mind — Full Autonomous Engine</title>
+    <title>The Mind — v8.0 Relational Subject</title>
     <style>
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
         :root {
-            --bg:#0c0c0d; --bg2:#131315; --bg3:#191920;
-            --b:rgba(255,255,255,0.055); --b2:rgba(255,255,255,0.1);
-            --t:#dad7cf; --t2:#68665f; --t3:#3a3835;
+            --bg:#070708; --bg2:#0f0f12; --bg3:#15151a;
+            --b:rgba(255,255,255,0.04); --b2:rgba(255,255,255,0.08);
+            --t:#c2bfb6; --t2:#5a5852; --t3:#2a2825;
             --f:'Georgia', serif; --m:'Courier New', monospace;
-            --c-somatic: #8a8a8e; --c-belief: #4a7a5a; --c-mem: #7a6a4a;
-            --c-shadow: #7a4a4a; --c-need: #5a4a7a;
+            --c-hyper: #ff8b8b; --c-hypo: #8baaff; --c-optimal: #60a57e; --c-collapse: #1a1a2e;
         }
 
-        body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:100vh; padding:18px 16px 60px; max-width:660px; margin:0 auto; overflow-x: hidden; }
-        .header { display:flex; align-items:center; gap:12px; margin-bottom:14px; padding-bottom:12px; border-bottom:0.5px solid var(--b); }
-        .avatar { width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid var(--b2);background:var(--bg3); }
+        body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:100vh; padding:20px; max-width:740px; margin:0 auto; line-height:1.4; }
+        .header { display:flex; align-items:center; gap:15px; margin-bottom:20px; padding-bottom:15px; border-bottom:0.5px solid var(--b); }
+        .avatar { width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid var(--b2);background:var(--bg3); transition: all 1s; }
         .mind-label { font-size:10px;color:var(--t3);text-transform:uppercase;font-family:var(--m); letter-spacing: 2px; }
-        .mind-status { font-size:11px;color:var(--t2);font-style:italic;margin-top:3px; }
+        .mind-status { font-size:11px;color:var(--t2);font-style:italic;margin-top:4px; }
 
-        .panel { border-radius:8px;border:0.5px solid var(--b);background:var(--bg2);padding:9px 11px;margin-bottom:9px; }
-        .panel-title { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;display:flex;justify-content:space-between; margin-bottom: 5px; }
+        .panel { border-radius:10px;border:0.5px solid var(--b);background:var(--bg2);padding:12px;margin-bottom:12px; }
+        .panel-title { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;display:flex;justify-content:space-between; margin-bottom: 8px; }
 
-        #life-timeline { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; }
-        .timeline-event { min-width: 140px; padding: 6px; background: var(--bg3); border: 0.5px solid var(--b); border-radius: 4px; font-size: 9px; font-family: var(--m); color: var(--t2); }
-
-        .thought-stream { border-radius:8px;border:0.5px solid var(--b);background:var(--bg2);padding:12px;height:280px;overflow-y:auto; margin-bottom:10px; display: flex; flex-direction: column-reverse; }
-        .thought { padding:6px 0; border-bottom:0.5px solid var(--b); font-size:13px; display:flex; gap:10px; }
-        .thought .ts { font-size:9px; color:var(--t3); font-family:var(--m); min-width: 45px; }
-        .thought.somatic { color: var(--c-somatic); font-style: italic; }
-        .thought.memory { color: var(--c-mem); }
-        .thought.shadow { color: var(--c-shadow); font-weight: bold; }
-        .thought.introject { color: #8a7a9e; font-style: italic; border-left: 2px solid var(--c-need); padding-left: 5px; }
+        /* Window & Orientation Visuals */
+        .meter-label { font-size:8px; color:var(--t3); font-family:var(--m); margin-top:4px; }
+        .wot-container { height:14px; background:var(--bg3); border-radius:4px; margin: 6px 0; position:relative; overflow:hidden; border:0.5px solid var(--b); }
+        .wot-safe-zone { position:absolute; height:100%; background:rgba(96, 165, 126, 0.1); border-left:1px solid var(--c-optimal); border-right:1px solid var(--c-optimal); transition: all 1s; }
+        .wot-indicator { position:absolute; width:2px; height:100%; background:white; transition: left 1s; z-index:5; }
         
-        .egrid { display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:9px; }
-        .ebar { border-radius:5px;padding:5px 6px;border:0.5px solid var(--b);background:var(--bg2); }
-        .ebar .el { font-size:9px;color:var(--t3);font-family:var(--m); }
-        .ebar .et { height:2px;background:rgba(255,255,255,.04); margin-top: 4px; }
-        .ebar .ef { height:100%; transition: width 0.8s; background: var(--t2); }
+        .orientation-reach { font-size:10px; font-family:var(--m); color:var(--c-optimal); margin-top:4px; opacity:0.8; }
 
-        .evbtn { border-radius:6px;padding:6px 10px;border:0.5px solid var(--b2);background:var(--bg3);font-size:10px;color:var(--t2);cursor:pointer; font-family: var(--m); }
-        .evbtn:hover { color:white; border-color:var(--t2); }
+        .egrid { display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px; }
+        .ebar { border-radius:6px;padding:6px 8px;border:0.5px solid var(--b);background:var(--bg3); }
+        .ebar .el { font-size:8px;color:var(--t2);font-family:var(--m); text-transform:uppercase; }
+        .ebar .et { height:2px;background:rgba(255,255,255,.03); margin-top: 5px; }
+        .ebar .ef { height:100%; transition: width 1s; background: var(--t2); }
+
+        .thought-stream { border-radius:10px;border:0.5px solid var(--b);background:var(--bg2);padding:15px;height:400px;overflow-y:auto; margin-bottom:12px; display: flex; flex-direction: column-reverse; transition: background 2s; }
+        .thought { padding:8px 0; border-bottom:0.5px solid var(--b); font-size:12px; display:flex; gap:12px; }
+        .thought .ts { font-size:9px; color:var(--t3); font-family:var(--m); min-width: 60px; }
+        .thought.meta { color: var(--c-optimal); }
+        .thought.hyper { color: var(--c-hyper); font-style: italic; }
+        .thought.hypo { color: var(--c-hypo); opacity:0.6; }
+        .thought.implicit { color: #888; border-left: 2px solid #444; padding-left: 8px; }
         
-        input[type="text"] { width:100%;background:var(--bg2);border:0.5px solid var(--b2);color:white;padding:10px;border-radius:6px; outline:none; font-family:var(--f); margin-bottom: 10px; }
-        #journal-box { font-size: 11px; color: var(--t2); font-style: italic; padding: 5px; background: rgba(0,0,0,0.2); border-radius: 4px; min-height: 30px; }
+        .evbtn { border-radius:8px;padding:8px 12px;border:1px solid var(--b2);background:var(--bg3);font-size:10px;color:var(--t2);cursor:pointer; font-family: var(--m); transition:0.3s; }
+        .evbtn:hover { border-color:var(--t2); color:var(--t); }
+        input[type="text"] { width:100%;background:var(--bg3);border:1px solid var(--b2);color:white;padding:12px;border-radius:8px; outline:none; font-family:var(--f); margin-bottom: 12px; }
+        
+        .attunement-slider { width:100px; cursor:pointer; vertical-align:middle; opacity:0.6; }
     </style>
 </head>
 <body>
 
 <div class="header">
-    <div class="avatar" id="avatar">👶</div>
+    <div class="avatar" id="avatar">...</div>
     <div style="flex:1">
-        <div class="mind-label">Autonomous Psyche Engine v2.0</div>
-        <div class="mind-status" id="status">Awake - Interoception Active</div>
+        <div class="mind-label">Relational Subject Engine v8.0</div>
+        <div class="mind-status" id="status">Awaiting contact...</div>
     </div>
-    <button class="evbtn" onclick="location.reload()">Reset</button>
+    <div class="ebar" style="min-width:140px;">
+        <div class="el">Caregiver Attunement <span id="att-val">50</span>%</div>
+        <input type="range" min="0" max="100" value="50" class="attunement-slider" id="att-slider">
+    </div>
 </div>
 
+<div class="panel">
+    <div class="panel-title">Window of Tolerance & Gravitational Orientation</div>
+    <div class="wot-container">
+        <div id="wot-zone" class="wot-safe-zone"></div>
+        <div id="wot-pos" class="wot-indicator"></div>
+    </div>
+    <div style="display:flex; justify-content:space-between; font-size:8px; font-family:var(--m); color:var(--t3);">
+        <span>COLLAPSE | HYPO</span>
+        <span>WINDOW OF TOLERANCE</span>
+        <span>HYPERAROUSAL</span>
+    </div>
+    <div id="reach-text" class="orientation-reach">Reaching for...</div>
+</div>
+
+<div class="panel-title">Biological Substrate</div>
 <div class="egrid">
     <div class="ebar"><div class="el">Cortisol</div><div class="et"><div id="bar-cortisol" class="ef"></div></div></div>
     <div class="ebar"><div class="el">Oxytocin</div><div class="et"><div id="bar-oxytocin" class="ef"></div></div></div>
-    <div class="ebar"><div class="el">Ego Strength</div><div class="et"><div id="bar-ego" class="ef"></div></div></div>
-    <div class="ebar"><div class="el">Shadow Load</div><div id="bar-shadow-color" class="et"><div id="bar-shadow" class="ef" style="background:var(--c-shadow)"></div></div></div>
-</div>
-
-<div class="panel">
-    <div class="panel-title">Narrative Journal (Autonomous Synthesis)</div>
-    <div id="journal-box">Waiting for life events to form narrative...</div>
-</div>
-
-<div class="panel">
-    <div class="panel-title">Life Timeline</div>
-    <div id="life-timeline"></div>
+    <div class="ebar"><div class="el">Relatedness</div><div class="et"><div id="bar-rel" class="ef"></div></div></div>
+    <div class="ebar"><div class="el">Shadow</div><div class="et"><div id="bar-shadow" class="ef" style="background:#5a3a3a"></div></div></div>
 </div>
 
 <div class="thought-stream" id="stream"></div>
 
 <div class="panel">
-    <div class="panel-title">External Stimuli & Development</div>
-    <input type="text" id="event-input" placeholder="Interact with the mind...">
-    <div style="display:flex; gap:5px;">
-        <button class="evbtn" style="flex:2" onclick="processManualEvent()">Submit Stimulus</button>
-        <button class="evbtn" style="flex:1" onclick="fastForwardPreset('safe')">Safe Growth</button>
-        <button class="evbtn" style="flex:1" onclick="fastForwardPreset('hard')">Hard Growth</button>
+    <input type="text" id="event-input" placeholder="Enter stimulus...">
+    <div style="display:flex; gap:8px;">
+        <button class="evbtn" style="flex:2" onclick="processManualEvent()">Submit Event</button>
+        <button class="evbtn" onclick="fastForwardPreset('safe')">Co-regulation (Safe)</button>
+        <button class="evbtn" onclick="fastForwardPreset('hard')">Isolation (Hard)</button>
     </div>
-    <div id="ff-progress" style="font-size:9px; color:var(--t3); margin-top:5px; font-family:var(--m);"></div>
 </div>
 
 <script>
 /* ═══════════════════════════════════════════════════════
-   EXTENDED PSYCHOLOGICAL STATE
+   THE RELATIONAL CORE
    ═══════════════════════════════════════════════════════ */
 const Mind = {
-    chemistry: { cortisol: 20, oxytocin: 50, ego: 50, shadow: 10 },
-    age: 0,
-    stage: 'Pre-verbal',
-    attachment: 'Undifferentiated',
-    activeDefense: 'None',
+    actual: { cortisol: 50, oxytocin: 50, relatedness: 50, shadow: 10 },
+    lastActual: null,
     
-    // Systems
+    wot: { min: 35, max: 65 }, // The Resilience Window
+    attunement: 0.5, // The Relational Repair Multiplier
+    
+    orientation: 'safety', // The Gravitational Pull
     memories: [],
-    shadowNodes: [], // Repressed thoughts
-    introjects: { // The internal voices of the caregiver
-        critic: "You are being too loud.",
-        nurturer: "You are safe now."
-    },
-    
-    // Circadian / Heartbeat
-    isDay: true,
     tickCount: 0,
-    heartbeatRate: 4500
+    nextMetaTick: 0
 };
 
-const PRIMITIVES = ["throat", "chest", "jaw", "breath", "morning", "void", "pulse"];
-
 /* ═══════════════════════════════════════════════════════
-   THE ENGINE LOGIC (SYSTEMS)
+   HEARTBEAT & AUTONOMOUS REACH
    ═══════════════════════════════════════════════════════ */
-
 function pulse() {
     Mind.tickCount++;
-    
-    // 1. BIOLOGICAL NOISE & SHADOW LEAK
-    // If shadow load is high, it "leaks" as unexplained cortisol
-    if (Mind.chemistry.shadow > 40) {
-        Mind.chemistry.cortisol += 2;
-        if (Math.random() > 0.8) logThought("Unexplained somatic anxiety. Pressure in chest.", "shadow");
+    if (!Mind.lastActual) Mind.lastActual = {...Mind.actual};
+
+    const arousal = Mind.actual.cortisol;
+    const attunement = document.getElementById('att-slider').value / 100;
+    document.getElementById('att-val').innerText = Math.round(attunement * 100);
+
+    // 1. STATE CLASSIFICATION
+    let state = "OPTIMAL";
+    if (arousal > Mind.wot.max) state = "HYPER";
+    else if (arousal < 15) state = "COLLAPSE"; // Total Shutdown
+    else if (arousal < Mind.wot.min) state = "HYPO";
+
+    // 2. RELATIONSHIP-BASED WINDOW REPAIR
+    if (state === "OPTIMAL") {
+        // Co-regulation expands the window. Attunement is the multiplier.
+        const expansion = 0.05 * (1 + attunement);
+        Mind.wot.max = Math.min(90, Mind.wot.max + expansion);
+        Mind.wot.min = Math.max(10, Mind.wot.min - expansion);
+    } else {
+        // Isolation or Dysregulation shrinks the window.
+        const shrinkage = 0.1 * (2 - attunement); 
+        Mind.wot.max -= shrinkage;
+        Mind.wot.min += shrinkage;
     }
 
-    // 2. DEFENSE HIERARCHY
-    // Logic: As stress (cortisol) rises, defense shifts from Sublimation -> Intellectualization -> Denial -> Regression
-    const stress = Mind.chemistry.cortisol;
-    if (stress < 30) Mind.activeDefense = "Sublimation";
-    else if (stress < 50) Mind.activeDefense = "Intellectualization";
-    else if (stress < 70) Mind.activeDefense = "Denial";
-    else Mind.activeDefense = "Regression";
+    // 3. GRAVITATIONAL REACH (Autonomous Pull)
+    updateOrientation();
+    applyAutonomousReach();
 
-    // 3. MEMORY RECONSOLIDATION (The Healing Mechanic)
-    // If a painful memory is recalled while Oxytocin is high, its cortisol weight drops
-    if (Mind.chemistry.oxytocin > 70 && Mind.memories.length > 0) {
-        const randomMem = Mind.memories[Math.floor(Math.random() * Mind.memories.length)];
-        if (randomMem.cortisolWeight > 20) {
-            randomMem.cortisolWeight -= 5;
-            logThought(`Somatic anchoring: Old memory of '${randomMem.text.substring(0,10)}...' feels less threatening.`, "somatic");
+    // 4. IMPLICIT INTRUSION (Somatic only)
+    if (state === "HYPER" && Math.random() > 0.9 && Mind.memories.length > 0) {
+        triggerImplicitIntrusion();
+    }
+
+    // 5. THOUGHT GENERATION
+    const stream = document.getElementById('stream');
+    if (state === "COLLAPSE") {
+        // Complete Silence
+        stream.style.background = "#020205";
+        logTimestampOnly();
+    } else {
+        stream.style.background = "var(--bg2)";
+        const metaInterval = state === "HYPER" ? 1 : state === "HYPO" ? 6 : 3;
+        if (Mind.tickCount >= Mind.nextMetaTick) {
+            generateThought(state);
+            Mind.nextMetaTick = Mind.tickCount + metaInterval;
         }
     }
 
-    // 4. THE INTROJECT (Internal Voice)
-    // Stress triggers the stored caregiver reactions
-    if (stress > 60 && Math.random() > 0.7) {
-        const voice = Mind.attachment === "Secure" ? Mind.introjects.nurturer : Mind.introjects.critic;
-        logThought(`[Inner Voice]: "${voice}"`, "introject");
-    }
-
-    // 5. NARRATIVE GENERATION (Every 10 pulses)
-    if (Mind.tickCount % 10 === 0) synthesizeNarrative();
-
-    // 6. DEFAULT SOMATIC OUTPUT
-    const status = stress > 60 ? "Breath shallow. Jaw clenched." : "Breath steady. Pulse rhythmic.";
-    logThought(status, "somatic");
-
-    updateUI();
+    // Biological Decay
+    Mind.actual.cortisol += (50 - Mind.actual.cortisol) * 0.05; 
+    Mind.lastActual = {...Mind.actual};
+    updateUI(state);
 }
 
+function updateOrientation() {
+    // Reaching for what is most depleted
+    const needs = { connection: Mind.actual.relatedness, safety: (100 - Mind.actual.cortisol), integrity: (100 - Mind.actual.shadow) };
+    Mind.orientation = Object.keys(needs).reduce((a, b) => needs[a] < needs[b] ? a : b);
+    document.getElementById('reach-text').innerText = `Orientation: Reaching for ${Mind.orientation.toUpperCase()}...`;
+}
+
+function applyAutonomousReach() {
+    // Every tick, the mind "leans" toward its orientation
+    if (Mind.orientation === 'connection') Mind.actual.relatedness += 0.2;
+    if (Mind.orientation === 'safety') Mind.actual.cortisol -= 0.2;
+    if (Mind.orientation === 'integrity') Mind.actual.shadow -= 0.2;
+}
+
+function triggerImplicitIntrusion() {
+    const trauma = Mind.memories.find(m => m.isTraumatic);
+    if (!trauma) return;
+
+    const narrativeFailed = Math.random() > 0.6;
+    if (narrativeFailed) {
+        logThought("[SYSTEM] Unexplained somatic activation. Implicit recall.", "implicit");
+    } else {
+        logThought(`[INTRUSION] Memory fragments: "${trauma.text}"`, "implicit");
+    }
+    
+    // Body remembers the specific channel
+    if (trauma.channel === 'cortisol') Mind.actual.cortisol += 15;
+    if (trauma.channel === 'shadow') Mind.actual.shadow += 10;
+    if (trauma.channel === 'relatedness') Mind.actual.relatedness -= 15;
+}
+
+function generateThought(state) {
+    if (state === "HYPER") {
+        const dShadow = Mind.actual.shadow - Mind.lastActual.shadow;
+        let msg = dShadow > 1 ? "Internal boundaries leaking. Shadow pressure." : "Arousal flooding the mirror. Cannot reflect.";
+        logThought(msg, "hyper");
+    } else if (state === "HYPO") {
+        logThought("Signaling distance... internal volume dropping.", "hypo");
+    } else {
+        logThought(`Synthesis: Coherent state. Gravitating toward ${Mind.orientation}.`, "meta");
+    }
+}
+
+/* ═══════════════════════════════════════════════════════
+   STIMULI & RELATIONAL ENCODING
+   ═══════════════════════════════════════════════════════ */
 function processManualEvent(customText = null) {
-    const input = document.getElementById('event-input');
-    const val = customText || input.value;
+    const val = customText || document.getElementById('event-input').value;
     if (!val) return;
 
-    // Gottman 5:1 Negativity Bias implementation
-    const isNegative = val.toLowerCase().match(/(hit|bad|leave|angry|no|hurt|cry|loud)/);
-    
+    const attunement = document.getElementById('att-slider').value / 100;
+    const isNegative = val.toLowerCase().match(/(hit|leave|no|hurt|loud|bang|shout|bad|alone)/);
+
+    // Somatic Channel Capture
+    const channels = { cortisol: Mind.actual.cortisol, shadow: Mind.actual.shadow, relatedness: (100-Mind.actual.relatedness) };
+    const bestChannel = Object.keys(channels).reduce((a, b) => channels[a] > channels[b] ? a : b);
+
     if (isNegative) {
-        Mind.chemistry.cortisol += 20;
-        Mind.chemistry.oxytocin -= 10;
-        Mind.chemistry.shadow += 5; // Negative events increase the shadow load
+        Mind.actual.cortisol += (25 * (1 - attunement)); // Attunement buffers the hit
+        Mind.actual.relatedness -= 20;
     } else {
-        Mind.chemistry.oxytocin += 15;
-        Mind.chemistry.cortisol -= 8;
+        // Healing Event
+        Mind.actual.oxytocin += (20 * attunement);
+        Mind.actual.cortisol -= (15 * attunement);
+        Mind.actual.relatedness += (15 * attunement);
     }
 
-    // Encode Memory
-    Mind.memories.push({
-        text: val,
-        cortisolWeight: Mind.chemistry.cortisol,
-        timestamp: new Date().toLocaleTimeString()
-    });
-
-    updateLifeTimeline(val);
-    input.value = "";
-    updateUI();
-}
-
-function synthesizeNarrative() {
-    const journal = document.getElementById('journal-box');
-    if (Mind.memories.length < 3) return;
-    
-    // Simple emergent narrative builder based on dominant chemistry
-    let theme = Mind.chemistry.cortisol > 50 ? "The world feels precarious and loud." : "There is a budding sense of predictability.";
-    if (Mind.attachment === "Disorganized") theme = "Care is a source of both safety and fear.";
-    
-    journal.innerText = `${theme} I remember ${Mind.memories[Mind.memories.length-1].text}.`;
+    Mind.memories.push({ text: val, isTraumatic: isNegative, channel: bestChannel });
+    document.getElementById('event-input').value = "";
 }
 
 async function fastForwardPreset(type) {
-    const progress = document.getElementById('ff-progress');
-    for (let i = 0; i < 5; i++) {
-        Mind.age += 12;
-        progress.innerText = `Year ${Math.floor(Mind.age/12)}: Processing developmental schemas...`;
-        
-        if (type === 'hard') {
-            Mind.chemistry.cortisol += 15;
-            Mind.chemistry.shadow += 10;
-            Mind.attachment = "Disorganized";
-            Mind.introjects.critic = "You are a burden.";
-            processManualEvent("Felt unsafe and ignored");
-        } else {
-            Mind.chemistry.oxytocin += 15;
-            Mind.chemistry.ego += 10;
-            Mind.attachment = "Secure";
-            processManualEvent("Felt seen and understood");
-        }
-        await new Promise(r => setTimeout(r, 600));
+    for (let i = 0; i < 4; i++) {
+        processManualEvent(type === 'hard' ? "Disconnected stressor" : "Attuned safety");
+        await new Promise(r => setTimeout(r, 400));
     }
-    progress.innerText = "Identity updated.";
-    Mind.stage = "Self-Aware";
-    updateUI();
 }
 
-/* ═══════════════════════════════════════════════════════
-   UI & RENDERING
-   ═══════════════════════════════════════════════════════ */
 function logThought(text, type) {
     const stream = document.getElementById('stream');
     const div = document.createElement('div');
     div.className = `thought ${type}`;
-    div.innerHTML = `<span class="ts">${new Date().toLocaleTimeString([], {hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit'})}</span> <span class="tx">${text}</span>`;
+    const ts = new Date().toLocaleTimeString([], {hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    div.innerHTML = `<span class="ts">${ts}</span> <span class="tx">${text}</span>`;
     stream.prepend(div);
 }
 
-function updateUI() {
-    document.getElementById('bar-cortisol').style.width = `${Math.min(Mind.chemistry.cortisol, 100)}%`;
-    document.getElementById('bar-oxytocin').style.width = `${Math.min(Mind.chemistry.oxytocin, 100)}%`;
-    document.getElementById('bar-ego').style.width = `${Math.min(Mind.chemistry.ego, 100)}%`;
-    document.getElementById('bar-shadow').style.width = `${Math.min(Mind.chemistry.shadow, 100)}%`;
-    
-    document.getElementById('status').innerText = `${Mind.stage} | Attachment: ${Mind.attachment} | Defense: ${Mind.activeDefense}`;
-    document.getElementById('avatar').innerText = Mind.age < 12 ? "👶" : Mind.age < 216 ? "🧑" : "🧓";
-}
-
-function updateLifeTimeline(eventText) {
-    const container = document.getElementById('life-timeline');
+function logTimestampOnly() {
+    const stream = document.getElementById('stream');
     const div = document.createElement('div');
-    div.className = 'timeline-event';
-    div.innerHTML = `<strong>Age ${Math.floor(Mind.age/12)}y</strong><br>${eventText}`;
-    container.prepend(div);
+    div.className = `thought`;
+    const ts = new Date().toLocaleTimeString([], {hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    div.innerHTML = `<span class="ts">${ts}</span> <span class="tx" style="opacity:0.2;">...</span>`;
+    stream.prepend(div);
 }
 
-window.fastForwardPreset = fastForwardPreset;
-window.processManualEvent = processManualEvent;
+function updateUI(state) {
+    document.getElementById('bar-cortisol').style.width = `${Mind.actual.cortisol}%`;
+    document.getElementById('bar-oxytocin').style.width = `${Mind.actual.oxytocin}%`;
+    document.getElementById('bar-rel').style.width = `${Mind.actual.relatedness}%`;
+    document.getElementById('bar-shadow').style.width = `${Mind.actual.shadow}%`;
 
-setInterval(pulse, Mind.heartbeatRate);
-updateUI();
-logThought("Somatic engine initialized. Interoception online.", "somatic");
+    const wotZone = document.getElementById('wot-zone');
+    wotZone.style.left = `${Mind.wot.min}%`;
+    wotZone.style.width = `${Mind.wot.max - Mind.wot.min}%`;
+    document.getElementById('wot-pos').style.left = `${Mind.actual.cortisol}%`;
 
+    const avatar = document.getElementById('avatar');
+    if (state === "COLLAPSE") { avatar.innerText = "⚫"; avatar.style.opacity = 0.3; }
+    else if (state === "HYPO") { avatar.innerText = "😶"; avatar.style.opacity = 0.6; }
+    else if (state === "HYPER") { avatar.innerText = "🤯"; avatar.style.opacity = 1.0; }
+    else { avatar.innerText = "🧑"; avatar.style.opacity = 0.8; }
+    
+    document.getElementById('status').innerText = `State: ${state} | Window: ${(Mind.wot.max - Mind.wot.min).toFixed(1)}% | Subjectivity Active`;
+}
+
+setInterval(pulse, 4500);
+updateUI("OPTIMAL");
+logThought("Relational Subjectivity Online. Reaching for orientation...", "meta");
 </script>
 </body>
 </html>
