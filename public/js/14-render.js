@@ -32,13 +32,20 @@ function render(){
   });
 
   // Semantic Grid
-  const sg=document.getElementById('sem-grid');sg.innerHTML='';
-  Object.values(nodes).filter(n => n.activation > 0.05).forEach(n=>{
-    const el=document.createElement('div');el.className='sem-node';
-    el.style.background = `rgba(255,255,255,${n.activation*0.2})`;
-    el.textContent=n.id.toLowerCase();
-    sg.appendChild(el);
-  });
+ // Semantic Grid Update
+  const sg=document.getElementById('sem-grid'); sg.innerHTML='';
+  Object.values(nodes)
+    .filter(n => n.activation > 0.05 || n.isBelief) // Show beliefs too
+    .sort((a,b) => b.activation - a.activation)
+    .slice(0, 40) // Keep it dense but not overwhelming
+    .forEach(n=>{
+      const el=document.createElement('div'); el.className='sem-node';
+      // Make Belief nodes stand out with a border
+      if (n.isBelief) el.style.border = '1px solid #4494bc'; 
+      el.style.background = `rgba(255,255,255,${Math.max(0.1, n.activation * 0.4)})`;
+      el.textContent=n.id.toLowerCase().replace('belief_', '★ ');
+      sg.appendChild(el);
+    });
 
   // Caregiver Panel
   const cgg = document.getElementById('cg-grid'); cgg.innerHTML='';
