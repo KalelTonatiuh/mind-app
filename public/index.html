@@ -21,17 +21,19 @@ body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:10
 .panel-title { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;display:flex;justify-content:space-between;cursor:pointer; }
 .sem-grid { display:flex;flex-wrap:wrap;gap:3px; }
 .sem-node { font-size:8px;font-family:var(--m);border-radius:3px;padding:1px 4px;border:0.5px solid var(--b); }
-.need-row { display:flex;gap:6px; }
+.need-row { display:flex;gap:6px; margin-top:5px; }
 .need-item { flex:1; }
 .need-label { font-size:9px;color:var(--t3);font-family:var(--m);margin-bottom:2px; }
 .need-track { height:3px;background:rgba(255,255,255,.04); }
 .need-fill { height:100%;transition:width .9s; }
 .schema-grid { display:grid;grid-template-columns:1fr 1fr;gap:4px; }
 .si { display:flex;align-items:center;gap:5px; }
-.sl { font-size:9px;color:var(--t3);font-family:var(--m);flex:1; }
+.sl { font-size:9px;color:var(--t3);font-family:var(--m);flex:1; white-space:nowrap; overflow:hidden; }
 .st { height:2px;flex:1;background:rgba(255,255,255,.04); }
 .sf { height:100%;transition:width .9s; }
-.mem-list { max-height:72px;overflow-y:auto; }
+.mem-list { max-height:120px; overflow-y:auto; font-size:10px; font-family:var(--m); color:var(--t3); }
+.mem-item { padding:2px 0; border-bottom:1px solid var(--b); display:flex; gap:8px; align-items:center; }
+.mem-dot { width:5px; height:5px; border-radius:50%; }
 .state-row { display:flex;gap:5px;margin-bottom:9px; }
 .scard { flex:1;min-width:0;border-radius:7px;padding:7px 9px;border:0.5px solid var(--b);background:var(--bg2); }
 .sc-l { font-size:9px;color:var(--t3);text-transform:uppercase;font-family:var(--m); }
@@ -44,17 +46,16 @@ body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:10
 .ebar .et { height:2px;background:rgba(255,255,255,.04); }
 .ebar .ef { height:100%;transition:width .8s; }
 .ebar .ev { font-size:9px;color:var(--t3);text-align:right;font-family:var(--m); }
-.def-row { border-radius:7px;padding:7px 10px;border:0.5px solid var(--b);background:var(--bg2);margin-bottom:9px;display:flex;align-items:baseline;gap:8px; }
-.tom-row { border-radius:7px;padding:7px 10px;border:0.5px solid var(--b);background:var(--bg2);margin-bottom:9px;font-size:10px;color:var(--t3);font-family:var(--m); min-height:28px; }
-.evgrid { display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:6px; }
-.evbtn { border-radius:6px;padding:6px 4px;border:0.5px solid var(--b2);background:var(--bg2);font-size:10px;color:var(--t2);cursor:pointer; }
-.thought-stream { border-radius:8px;border:0.5px solid var(--b);background:var(--bg2);padding:12px;min-height:130px;max-height:320px;overflow-y:auto; margin-bottom:10px; }
-.thought { padding:4px 0;border-bottom:0.5px solid var(--b);font-size:12px;color:var(--t);display:flex;gap:7px; }
-.thought .ts { font-size:9px;color:var(--t3);font-family:var(--m); }
 .tbar { border-radius:5px;padding:6px 8px;border:0.5px solid var(--b);background:var(--bg2); margin-bottom:4px; }
-.tbar-label { font-size:9px;color:var(--t3);font-family:var(--m); }
+.tbar-label { font-size:9px;color:var(--t3);font-family:var(--m); margin-bottom:2px; }
 .tbar-track { height:3px;background:rgba(255,255,255,.06); }
 .tbar-fill { height:100%; }
+.evgrid { display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:6px; }
+.evbtn { border-radius:6px;padding:6px 4px;border:0.5px solid var(--b2);background:var(--bg2);font-size:10px;color:var(--t2);cursor:pointer; }
+.thought-stream { border-radius:8px;border:0.5px solid var(--b);background:var(--bg2);padding:12px;min-height:130px;max-height:320px;overflow-y:auto; }
+.thought { padding:4px 0; border-bottom:1px solid var(--b); font-size:12px; color:var(--t); display:flex; gap:7px; }
+.thought .ts { font-size:9px; color:var(--t3); font-family:var(--m); }
+.dtag { font-size:8px; font-family:var(--m); border-radius:3px; padding:1px 4px; opacity:0.5; margin-left:auto; }
 </style>
 </head>
 <body>
@@ -69,10 +70,10 @@ body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:10
 </div>
 
 <div class="panel">
-    <div class="panel-title">Fast-Forward</div>
+    <div class="panel-title">Fast-Forward Development</div>
     <textarea id="ff-input" style="width:100%;background:var(--bg3);border:0.5px solid var(--b2);color:white;font-size:11px;padding:8px;border-radius:6px;margin-bottom:6px;" rows="2"></textarea>
     <div style="display:flex; gap:5px;">
-        <button class="evbtn" onclick="fastForward()">Run FF ↗</button>
+        <button class="evbtn" style="flex:1" onclick="fastForward()">Run FF ↗</button>
         <button class="evbtn" onclick="fastForwardPreset('safe')">Safe</button>
         <button class="evbtn" onclick="fastForwardPreset('hard')">Hard</button>
     </div>
@@ -88,14 +89,15 @@ body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:10
 </div>
 
 <div class="panel" id="p-temp">
-    <div class="panel-title" onclick="togglePanel('p-temp','temp-grid')"><span>Temperament</span> <span class="ptog">▾</span></div>
-    <div id="temp-grid"></div>
+    <div class="panel-title" onclick="togglePanel('p-temp','temp-grid')"><span>Temperament (DNA)</span> <span class="ptog">▾</span></div>
+    <div id="temp-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;"></div>
 </div>
 
 <div class="panel" id="p-sem">
-    <div class="panel-title" onclick="togglePanel('p-sem','sem-grid')"><span>Semantic Network</span> <span class="ptog">▾</span></div>
-    <div id="sem-grid" class="sem-grid"></div>
-    <div id="sem-plasticity" style="font-size:9px;color:var(--t3);margin-top:6px;"></div>
+    <div class="panel-title" onclick="togglePanel('p-sem','b-sem')"><span>Semantic Network</span> <span class="ptog">▾</span></div>
+    <div id="b-sem">
+        <div class="sem-grid" id="sem-grid"></div>
+    </div>
 </div>
 
 <div class="panel">
@@ -122,8 +124,7 @@ body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:10
 <div class="egrid" id="egrid"></div>
 
 <div class="def-row">
-  <div class="sc-l">Defense</div>
-  <div class="def-n" id="defn">none</div>
+  <div class="sc-l" id="defn" style="font-weight:bold; color:var(--t)">none</div>
   <div id="def-style" style="margin-left:auto;opacity:0.5;font-size:9px"></div>
 </div>
 
@@ -136,11 +137,6 @@ body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:10
 </div>
 
 <div class="thought-stream" id="stream"></div>
-
-<!-- Hidden tech helpers -->
-<div id="sem-count" style="display:none"></div>
-<div id="defd" style="display:none"></div>
-<div id="schema-age" style="display:none"></div>
 
 <script src="js/01-primes.js"></script>
 <script src="js/02-network.js"></script>
