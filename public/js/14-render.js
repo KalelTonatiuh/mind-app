@@ -200,4 +200,11 @@ function render(){
   document.getElementById('mem-count').textContent=episodicMemory.length
     ?`— ${episodicMemory.length} ep${beliefCount?`, ${beliefCount} beliefs`:''}`
     :'— empty';
+    // --- ADD THIS AT THE END OF THE RENDER FUNCTION ---
+  const bodyStatus = document.getElementById('dev-plasticity');
+  if (bodyStatus) {
+    bodyStatus.innerHTML += `<br><b>Body:</b> Hunger ${Math.round(BODY.hunger)}% · ` +
+      `Fatigue ${Math.round(BODY.fatigue)}% · ` +
+      `${BODY.isAsleep ? '<span style="color:#4494bc">SLEEPING</span>' : 'AWAKE'}`;
+  }
 }
