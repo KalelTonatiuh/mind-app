@@ -13,30 +13,55 @@
   --f:'Georgia',serif; --m:'Courier New',monospace;
 }
 body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:100vh; padding:18px 16px 60px; max-width:660px; margin:0 auto; }
-
 .header { display:flex; align-items:center; gap:12px; margin-bottom:14px; padding-bottom:12px; border-bottom:0.5px solid var(--b); }
-.avatar { width:44px;height:44px;border-radius:50%;border:1.5px solid var(--b2);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px; }
-.mind-label { font-size:10px;color:var(--t3);text-transform:uppercase;font-family:var(--m); }
+.avatar { width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid var(--b2);background:var(--bg3);transition:0.5s; flex-shrink:0; }
+.mind-label { font-size:10px;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;font-family:var(--m); }
 .mind-status { font-size:12px;color:var(--t2);font-style:italic;margin-top:3px; }
-
 .panel { border-radius:8px;border:0.5px solid var(--b);background:var(--bg2);padding:9px 11px;margin-bottom:9px; }
-.panel-title { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;display:flex;justify-content:space-between;cursor:pointer; }
-
-.grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px; }
-.stat-card { border-radius:5px; padding:6px; border:0.5px solid var(--b); background:var(--bg3); }
-.stat-l { font-size:8px; color:var(--t3); text-transform:uppercase; font-family:var(--m); }
-.stat-v { font-size:11px; color:var(--t); }
-
-.evgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-bottom:10px; }
-.evbtn { border-radius:6px; padding:6px 4px; border:0.5px solid var(--b2); background:var(--bg2); font-size:10px; color:var(--t2); cursor:pointer; }
-.evbtn:hover { background:var(--bg3); color:var(--t); }
-
-.thought-stream { border-radius:8px; border:0.5px solid var(--b); background:var(--bg2); padding:12px; min-height:150px; max-height:300px; overflow-y:auto; margin-bottom: 20px;}
-.thought { padding:4px 0; border-bottom:0.5px solid var(--b); font-size:13px; color:var(--t); display:flex; gap:10px; }
-.thought .ts { font-size:9px; color:var(--t3); font-family:var(--m); }
-
-/* Hidden helper elements to prevent JS crashes */
-#egrid, #sem-grid, #mem-list, #need-row, #dn, #bn, #bs, #ts2, #defn, #defd, #def-style, #tom-display, #sem-count, #sem-plasticity, #schema-age, #mem-count { display:none; }
+.panel-title { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center; }
+.ptog { cursor:pointer;color:var(--t3); }
+.sem-grid { display:flex;flex-wrap:wrap;gap:3px; }
+.sem-node { font-size:8px;font-family:var(--m);border-radius:3px;padding:1px 4px;border:0.5px solid var(--b); }
+.need-row { display:flex;gap:6px;margin-bottom:7px; }
+.need-item { flex:1; }
+.need-label { font-size:9px;color:var(--t3);font-family:var(--m);margin-bottom:2px; }
+.need-track { height:3px;border-radius:2px;background:rgba(255,255,255,.04);overflow:hidden; }
+.need-fill { height:100%;border-radius:2px;transition:width .9s; }
+.schema-grid { display:grid;grid-template-columns:1fr 1fr;gap:4px; }
+.si { display:flex;align-items:center;gap:5px; }
+.si .sl { font-size:9px;color:var(--t3);font-family:var(--m);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.si .st { height:2px;flex:1;border-radius:1px;background:rgba(255,255,255,.04);overflow:hidden; }
+.si .sf { height:100%;border-radius:1px;transition:width .9s; }
+.si .sv { font-size:9px;color:var(--t3);font-family:var(--m);min-width:18px;text-align:right; }
+.mem-list { max-height:72px;overflow-y:auto; }
+.mem-item { font-size:10px;color:var(--t3);font-family:var(--m);padding:2px 0;border-bottom:0.5px solid var(--b);display:flex;gap:5px; }
+.state-row { display:flex;gap:5px;margin-bottom:9px; }
+.scard { flex:1;min-width:0;border-radius:7px;padding:7px 9px;border:0.5px solid var(--b);background:var(--bg2); }
+.sc-l { font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;font-family:var(--m); }
+.sc-v { font-size:11px;color:var(--t);overflow:hidden;white-space:nowrap; }
+.sc-s { font-size:9px;color:var(--t3);margin-top:1px;font-family:var(--m);overflow:hidden; }
+.egrid { display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:9px; }
+.ebar { border-radius:5px;padding:5px 6px;border:0.5px solid var(--b);background:var(--bg2); }
+.ebar .el { font-size:9px;color:var(--t3);font-family:var(--m); }
+.ebar .ei { font-size:8px;color:var(--t3);font-style:italic;margin-bottom:2px; }
+.ebar .et { height:2px;border-radius:1px;background:rgba(255,255,255,.04);overflow:hidden;margin-bottom:2px; }
+.ebar .ef { height:100%;border-radius:1px;transition:width .8s; }
+.ebar .ev { font-size:9px;color:var(--t3);text-align:right;font-family:var(--m); }
+.def-row { border-radius:7px;padding:7px 10px;border:0.5px solid var(--b);background:var(--bg2);margin-bottom:9px;display:flex;align-items:baseline;gap:8px; min-height:30px; }
+.def-n { font-size:11px;color:var(--t); }
+.tom-row { border-radius:7px;padding:7px 10px;border:0.5px solid var(--b);background:var(--bg2);margin-bottom:9px;font-size:10px;color:var(--t3);font-family:var(--m); min-height:28px; display:flex; align-items:center; gap:8px;}
+.evgrid { display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:6px; }
+.evbtn { border-radius:6px;padding:6px 4px;border:0.5px solid var(--b2);background:var(--bg2);font-size:10px;font-family:var(--f);color:var(--t2);cursor:pointer; }
+.custom-row { display:flex;gap:5px;margin-bottom:11px; }
+.custom-row input { flex:1;border-radius:6px;padding:6px 9px;border:0.5px solid var(--b2);background:var(--bg2);font-size:11px;color:var(--t);outline:none; }
+.thought-stream { border-radius:8px;border:0.5px solid var(--b);background:var(--bg2);padding:12px;min-height:130px;max-height:320px;overflow-y:auto; }
+.thought { padding:4px 0;border-bottom:0.5px solid var(--b);font-size:12px;line-height:1.75;color:var(--t);display:flex;gap:7px; }
+.thought .ts { font-size:9px;color:var(--t3);font-family:var(--m); }
+.tbar { border-radius:5px;padding:6px 8px;border:0.5px solid var(--b);background:var(--bg2); margin-bottom:4px; }
+.tbar-label { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;margin-bottom:1px; }
+.tbar-track { height:3px;border-radius:2px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:3px; }
+.tbar-fill { height:100%;transition:width .6s; }
+.tbar-desc { font-size:9px;color:var(--t3);font-style:italic; }
 </style>
 </head>
 <body>
@@ -46,46 +71,82 @@ body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:10
   <div style="flex:1">
     <div class="mind-label">The Mind</div>
     <div class="mind-status" id="status">...</div>
-    <div id="dev-stage" style="font-size:10px; color:var(--t3)">Pre-verbal</div>
   </div>
   <button class="evbtn" onclick="resetMind()">reset</button>
 </div>
 
-<div class="thought-stream" id="stream"></div>
-
-<div class="evgrid" id="evgrid"></div>
-
-<div class="panel" id="p-state">
-  <div class="panel-title" onclick="togglePanel('p-state','b-state')"><span>Vital Signs</span> <span class="ptog">▾</span></div>
-  <div class="grid-2" id="b-state">
-    <div class="stat-card"><div class="stat-l">Emotion</div><div class="stat-v" id="ds">Neutral</div></div>
-    <div class="stat-card"><div class="stat-l">Trend</div><div class="stat-v" id="tv">Stable</div></div>
-    <div class="stat-card" style="grid-column: span 2;"><div class="stat-l">Body</div><div class="stat-v" id="dev-plasticity">Awake</div></div>
-  </div>
+<div class="panel" id="p-ff">
+    <div class="panel-title">Fast-Forward</div>
+    <textarea id="ff-input" style="width:100%;background:var(--bg3);border:0.5px solid var(--b2);color:white;font-size:11px;padding:8px;border-radius:6px;margin-bottom:6px;" rows="2" placeholder="describe a childhood..."></textarea>
+    <div style="display:flex; gap:5px;">
+        <button class="evbtn" onclick="fastForward()">Run FF ↗</button>
+        <button class="evbtn" onclick="fastForwardPreset('safe')">Safe</button>
+        <button class="evbtn" onclick="fastForwardPreset('hard')">Hard</button>
+    </div>
+    <div id="ff-progress" style="font-size:9px;color:var(--t3);margin-top:4px;"></div>
 </div>
 
-<div class="panel" id="p-care">
-  <div class="panel-title" onclick="togglePanel('p-care','cg-grid')"><span>Relationship</span> <span class="ptog">▸</span></div>
-  <div class="grid-2" id="cg-grid" style="display:none"></div>
-  <div id="cg-iwm" style="font-size:9px; color:var(--t3); padding:5px;"></div>
+<div class="panel" id="p-cg">
+    <div class="panel-title"><span>Caregiver & Attachment</span><span class="ptog" onclick="togglePanel('p-cg','b-cg')">▾</span></div>
+    <div id="b-cg">
+        <div id="cg-grid"></div>
+        <div id="cg-iwm" style="font-size:9px;color:var(--t3);margin-top:6px;"></div>
+    </div>
 </div>
 
 <div class="panel" id="p-temp">
-  <div class="panel-title" onclick="togglePanel('p-temp','temp-grid')"><span>Temperament</span> <span class="ptog">▸</span></div>
-  <div class="grid-2" id="temp-grid" style="display:none"></div>
+    <div class="panel-title"><span>Temperament</span><span class="ptog" onclick="togglePanel('p-temp','b-temp')">▾</span></div>
+    <div id="b-temp"><div id="temp-grid"></div></div>
+</div>
+
+<div class="panel" id="p-sem">
+    <div class="panel-title"><span>Semantic Network</span><span class="ptog" onclick="togglePanel('p-sem','b-sem')">▾</span></div>
+    <div id="b-sem">
+        <div class="sem-grid" id="sem-grid"></div>
+        <div id="sem-plasticity" style="font-size:9px;color:var(--t3);margin-top:6px;"></div>
+        <div id="sem-count" style="display:none"></div>
+    </div>
+</div>
+
+<div class="panel" id="p-needs">
+    <div class="panel-title">Psychological Needs</div>
+    <div class="need-row" id="need-row"></div>
+</div>
+
+<div class="panel" id="p-mem">
+    <div class="panel-title"><span>Memory & Beliefs</span><span id="mem-count" style="margin-left:auto;opacity:0.5"></span></div>
+    <div class="mem-list" id="mem-list"></div>
 </div>
 
 <div class="panel" id="p-core">
-  <div class="panel-title" onclick="togglePanel('p-core','schema-grid')"><span>Beliefs</span> <span class="ptog">▸</span></div>
-  <div class="grid-2" id="schema-grid" style="display:none"></div>
+    <div class="panel-title">Core Beliefs (Schemas)</div>
+    <div class="schema-grid" id="schema-grid"></div>
+    <div id="schema-age" style="display:none"></div>
 </div>
 
-<!-- Technical placeholders -->
-<div id="egrid"></div><div id="sem-grid"></div><div id="mem-list"></div><div id="need-row"></div>
-<div id="dn"></div><div id="bn"></div><div id="bs"></div><div id="ts2"></div>
-<div id="defn"></div><div id="defd"></div><div id="def-style"></div>
-<div id="tom-display"></div><div id="sem-count"></div><div id="sem-plasticity"></div>
-<div id="schema-age"></div><div id="mem-count"></div>
+<div class="state-row">
+  <div class="scard"><div class="sc-l">State</div><div class="sc-v" id="ds">Neutral</div><div class="sc-s" id="dn">—</div></div>
+  <div class="scard"><div class="sc-l">Trend</div><div class="sc-v" id="tv">→ stable</div><div class="sc-s" id="ts2">—</div></div>
+  <div class="scard"><div class="sc-l">Identity</div><div class="sc-v" id="dev-stage">Pre-verbal</div><div class="sc-s" id="dev-plasticity">—</div></div>
+</div>
+
+<div class="egrid" id="egrid"></div>
+
+<div class="def-row">
+  <div class="def-n" id="defn" style="font-weight:bold">none</div>
+  <div class="def-n" id="def-style" style="margin-left:auto;opacity:0.5;font-size:9px"></div>
+</div>
+<div id="defd" style="display:none"></div>
+
+<div class="tom-row"><span id="tom-display">...</span></div>
+
+<div class="evgrid" id="evgrid"></div>
+<div class="custom-row">
+  <input type="text" id="ci" placeholder="what happens..." />
+  <button class="evbtn" onclick="sendCustom()">apply</button>
+</div>
+
+<div class="thought-stream" id="stream"></div>
 
 <script src="js/01-primes.js"></script>
 <script src="js/02-network.js"></script>

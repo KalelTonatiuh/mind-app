@@ -85,10 +85,9 @@ function resetMind(){
 function togglePanel(pid, bid) {
   const body = document.getElementById(bid);
   const parent = document.getElementById(pid);
-  const tog = parent.querySelector('.ptog'); // Find the button inside the panel
-  
+  const tog = parent.querySelector('.ptog');
   if (body.style.display === 'none') {
-    body.style.display = 'grid'; // Use grid for the stat cards
+    body.style.display = 'block';
     if (tog) tog.textContent = '▾';
   } else {
     body.style.display = 'none';
