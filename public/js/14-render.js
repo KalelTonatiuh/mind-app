@@ -8,65 +8,73 @@ function friendly(val) {
 
 function render(){
   const[dk,dv]=dominant(),em=EM[dk];
-  const d=getDyad(),def=getDefense(),tr=getTrend(),dev=getDevStage();
+  const tr=getTrend(),dev=getDevStage();
 
-  // Header & Identity
-  document.getElementById('av').textContent=em.icon;
-  document.getElementById('av').style.borderColor=em.c+'88';
-  document.getElementById('status').textContent = (NARRATIVE_SELF.strength > 0.2 ? '"'+p(NARRATIVE_SELF.phrases)+'"' : FUNC[dk]);
-  document.getElementById('dev-stage').textContent = `${dev.name} · ${eventCount} events experienced`;
-
-  // Basic State
-  document.getElementById('ds').textContent = em.label;
-  document.getElementById('tv').textContent = tr.l;
-  
-  // Body Stats (Human friendly)
-  const bodyText = BODY.isAsleep ? '<span style="color:#5b8fb9">Sleeping</span>' : 'Awake';
-  const stressText = BODY.fatigue > 70 ? 'Exhausted' : BODY.fatigue > 30 ? 'Tired' : 'Rested';
-  document.getElementById('dev-plasticity').innerHTML = `${bodyText} (${stressText})`;
-
-  // Caregiver & Attachment
-  const att = getAttachmentStyle();
-  const iwmEl = document.getElementById('cg-iwm');
-  if(IWM.sampleCount < 3) {
-    iwmEl.textContent = 'Social bonds are forming...';
-  } else {
-    iwmEl.innerHTML = `<b style="color:${att.color}">${att.name} Attachment</b> — ${att.desc}`;
+  // Basic Header Info
+  const av = document.getElementById('av');
+  if(av) {
+    av.textContent=em.icon;
+    av.style.borderColor=em.c+'88';
   }
 
-  // Caregiver Grid (Technical)
-  const cgg = document.getElementById('cg-grid'); cgg.innerHTML='';
-  const cgItems = [
-    { label:'C.G. Stress', val: CAREGIVER.stress },
-    { label:'C.G. Mood', val: CAREGIVER.mood },
-  ];
-  cgItems.forEach(item => {
-    const el = document.createElement('div'); el.className='stat-card';
-    el.innerHTML=`<div class="stat-label">${item.label}</div><div class="stat-val">${friendly(item.val)}</div>`;
-    cgg.appendChild(el);
-  });
+  const status = document.getElementById('status');
+  if(status) status.textContent = (NARRATIVE_SELF.strength > 0.2 ? '"'+p(NARRATIVE_SELF.phrases)+'"' : FUNC[dk]);
 
-  // Temperament Grid (Human words)
-  const tg = document.getElementById('temp-grid'); tg.innerHTML='';
-  const TEMP_DEFS = [
-    { key:'negAffect', label:'Sensitivity' },
-    { key:'surgency', label:'Sociability' },
-    { key:'effortControl',label:'Self-Regulation' },
-    { key:'orientSens', label:'Curiosity' },
-  ];
-  TEMP_DEFS.forEach(td => {
-    const el = document.createElement('div'); el.className='stat-card';
-    el.innerHTML=`<div class="stat-label">${td.label}</div><div class="stat-val">${friendly(TEMP[td.key])}</div>`;
-    tg.appendChild(el);
-  });
+  const devStage = document.getElementById('dev-stage');
+  if(devStage) devStage.textContent = `${dev.name} · ${eventCount} events`;
 
-  // Schemas (Only show the ones that have actually formed)
-  const schg=document.getElementById('schema-grid'); schg.innerHTML='';
-  Object.values(SCHEMAS).forEach(s=>{
-    if (s.strength > 0.1) {
-      const el=document.createElement('div'); el.className='stat-card';
-      el.innerHTML=`<div class="stat-label">Belief</div><div class="stat-val">${s.label}</div>`;
-      schg.appendChild(el);
-    }
-  });
+  // Vital Signs
+  const ds = document.getElementById('ds');
+  if(ds) ds.textContent = em.label;
+
+  const tv = document.getElementById('tv');
+  if(tv) tv.textContent = tr.l;
+  
+  const devPlas = document.getElementById('dev-plasticity');
+  if(devPlas) {
+    const bodyText = BODY.isAsleep ? 'Sleeping' : 'Awake';
+    const stressText = BODY.fatigue > 70 ? 'Exhausted' : BODY.fatigue > 30 ? 'Tired' : 'Rested';
+    devPlas.textContent = `${bodyText} (${stressText})`;
+  }
+
+  // Caregiver / Attachment
+  const att = getAttachmentStyle();
+  const iwmEl = document.getElementById('cg-iwm');
+  if(iwmEl) iwmEl.innerHTML = (IWM.sampleCount < 3) ? 'Social bonds forming...' : `<b style="color:${att.color}">${att.name}</b>: ${att.desc}`;
+
+  const cgg = document.getElementById('cg-grid');
+  if(cgg) {
+    cgg.innerHTML=`<div class="stat-card"><div class="stat-l">C.G. Stress</div><div class="stat-v">${friendly(CAREGIVER.stress)}</div></div>` +
+                  `<div class="stat-card"><div class="stat-l">C.G. Mood</div><div class="stat-v">${friendly(CAREGIVER.mood)}</div></div>`;
+  }
+
+  // Temperament
+  const tg = document.getElementById('temp-grid');
+  if(tg) {
+    tg.innerHTML='';
+    const TEMP_DEFS = [
+      { key:'negAffect', label:'Sensitivity' },
+      { key:'surgency', label:'Sociability' },
+      { key:'effortControl',label:'Regulation' },
+      { key:'orientSens', label:'Curiosity' },
+    ];
+    TEMP_DEFS.forEach(td => {
+      const el = document.createElement('div'); el.className='stat-card';
+      el.innerHTML=`<div class="stat-l">${td.label}</div><div class="stat-v">${friendly(TEMP[td.key])}</div>`;
+      tg.appendChild(el);
+    });
+  }
+
+  // Schemas
+  const schg=document.getElementById('schema-grid');
+  if(schg) {
+    schg.innerHTML='';
+    Object.values(SCHEMAS).forEach(s=>{
+      if (s.strength > 0.1) {
+        const el=document.createElement('div'); el.className='stat-card';
+        el.innerHTML=`<div class="stat-l">Belief</div><div class="stat-v">${s.label}</div>`;
+        schg.appendChild(el);
+      }
+    });
+  }
 }

@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Mind</title>
 <style>
-/* RESTORING ORIGINAL DARK COLORS */
 *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 :root {
   --bg:#0c0c0d; --bg2:#131315; --bg3:#191920;
@@ -16,36 +15,28 @@
 body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:100vh; padding:18px 16px 60px; max-width:660px; margin:0 auto; }
 
 .header { display:flex; align-items:center; gap:12px; margin-bottom:14px; padding-bottom:12px; border-bottom:0.5px solid var(--b); }
-.avatar { width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid var(--b2);background:var(--bg3);transition:background 1.2s,border-color 1.2s;flex-shrink:0; }
-.mind-label { font-size:10px;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;font-family:var(--m); }
+.avatar { width:44px;height:44px;border-radius:50%;border:1.5px solid var(--b2);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:18px; }
+.mind-label { font-size:10px;color:var(--t3);text-transform:uppercase;font-family:var(--m); }
 .mind-status { font-size:12px;color:var(--t2);font-style:italic;margin-top:3px; }
 
 .panel { border-radius:8px;border:0.5px solid var(--b);background:var(--bg2);padding:9px 11px;margin-bottom:9px; }
-.panel-title { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center; }
-.ptog { cursor:pointer;color:var(--t3); font-size: 14px; }
+.panel-title { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;display:flex;justify-content:space-between;cursor:pointer; }
 
-/* The grids for stats */
-.grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:5px; }
+.grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:5px; margin-top:10px; }
 .stat-card { border-radius:5px; padding:6px; border:0.5px solid var(--b); background:var(--bg3); }
-.stat-l { font-size:8px; color:var(--t3); text-transform:uppercase; margin-bottom:2px; font-family:var(--m); }
+.stat-l { font-size:8px; color:var(--t3); text-transform:uppercase; font-family:var(--m); }
 .stat-v { font-size:11px; color:var(--t); }
 
-/* Buttons & Inputs */
-.evgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-bottom:6px; }
-.evbtn { border-radius:6px; padding:6px 4px; border:0.5px solid var(--b2); background:var(--bg2); font-size:10px; font-family:var(--f); color:var(--t2); cursor:pointer; text-align:center; }
+.evgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; margin-bottom:10px; }
+.evbtn { border-radius:6px; padding:6px 4px; border:0.5px solid var(--b2); background:var(--bg2); font-size:10px; color:var(--t2); cursor:pointer; }
 .evbtn:hover { background:var(--bg3); color:var(--t); }
 
-.thought-stream { border-radius:8px; border:0.5px solid var(--b); background:var(--bg2); padding:12px; min-height:130px; max-height:320px; overflow-y:auto; margin-bottom: 20px;}
-.thought { padding:4px 0; border-bottom:0.5px solid var(--b); font-size:12px; line-height:1.75; color:var(--t); display:flex; gap:7px; }
-.thought .ts { font-size:9px; color:var(--t3); font-family:var(--m); flex-shrink:0; }
-.thought.nv .tx { color:var(--t3); font-style:italic; }
+.thought-stream { border-radius:8px; border:0.5px solid var(--b); background:var(--bg2); padding:12px; min-height:150px; max-height:300px; overflow-y:auto; margin-bottom: 20px;}
+.thought { padding:4px 0; border-bottom:0.5px solid var(--b); font-size:13px; color:var(--t); display:flex; gap:10px; }
+.thought .ts { font-size:9px; color:var(--t3); font-family:var(--m); }
 
-/* Fast-forward */
-.ff-panel { border-radius:8px; border:0.5px solid var(--b2); background:var(--bg2); padding:10px 12px; margin-bottom:9px; }
-.ff-input { width:100%; border-radius:6px; padding:7px 9px; border:0.5px solid var(--b2); background:var(--bg3); font-size:11px; color:var(--t); outline:none; margin-bottom:6px; }
-
-/* Hide standard grids needed for background processing */
-#egrid, #sem-grid, #mem-list, #need-row, #schema-grid { display:none; }
+/* Hidden helper elements to prevent JS crashes */
+#egrid, #sem-grid, #mem-list, #need-row, #dn, #bn, #bs, #ts2, #defn, #defd, #def-style, #tom-display, #sem-count, #sem-plasticity, #schema-age, #mem-count { display:none; }
 </style>
 </head>
 <body>
@@ -54,65 +45,47 @@ body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:10
   <div class="avatar" id="av">🧍</div>
   <div style="flex:1">
     <div class="mind-label">The Mind</div>
-    <div class="mind-status" id="status">Observing...</div>
+    <div class="mind-status" id="status">...</div>
     <div id="dev-stage" style="font-size:10px; color:var(--t3)">Pre-verbal</div>
   </div>
   <button class="evbtn" onclick="resetMind()">reset</button>
 </div>
 
-<!-- THOUGHT STREAM AT THE TOP -->
-<div class="thought-stream" id="stream">
-  <div class="thought nv"><span class="ts">—</span><span class="tx">sensation only.</span></div>
-</div>
+<div class="thought-stream" id="stream"></div>
 
-<!-- STIMULUS BUTTONS -->
 <div class="evgrid" id="evgrid"></div>
-<div style="display:flex; gap:5px; margin-bottom:15px;">
-  <input type="text" id="ci" placeholder="custom event..." style="flex:1; background:var(--bg2); border:0.5px solid var(--b2); color:white; padding:5px; border-radius:5px;">
-  <button class="evbtn" onclick="sendCustom()">apply</button>
-</div>
 
-<!-- FAST FORWARD -->
-<div class="ff-panel">
-  <input class="ff-input" id="ff-input" placeholder="childhood history...">
-  <div style="display:flex; gap:5px;">
-    <button class="evbtn" style="flex:1" onclick="fastForward()">Run Fast-Forward</button>
-    <button class="evbtn" onclick="fastForwardPreset('safe')">Safe</button>
-    <button class="evbtn" onclick="fastForwardPreset('hard')">Hard</button>
-  </div>
-  <div id="ff-progress" style="font-size:9px; color:var(--t3); margin-top:5px;"></div>
-</div>
-
-<!-- COLLAPSIBLE PANELS -->
 <div class="panel" id="p-state">
-  <div class="panel-title"><span>Vital Signs</span> <span class="ptog" onclick="togglePanel('p-state','b-state')">▾</span></div>
+  <div class="panel-title" onclick="togglePanel('p-state','b-state')"><span>Vital Signs</span> <span class="ptog">▾</span></div>
   <div class="grid-2" id="b-state">
     <div class="stat-card"><div class="stat-l">Emotion</div><div class="stat-v" id="ds">Neutral</div></div>
     <div class="stat-card"><div class="stat-l">Trend</div><div class="stat-v" id="tv">Stable</div></div>
-    <div class="stat-card" style="grid-column: span 2;"><div class="stat-l">Body State</div><div class="stat-v" id="dev-plasticity">Awake</div></div>
+    <div class="stat-card" style="grid-column: span 2;"><div class="stat-l">Body</div><div class="stat-v" id="dev-plasticity">Awake</div></div>
   </div>
 </div>
 
 <div class="panel" id="p-care">
-  <div class="panel-title"><span>Relationship & Attachment</span> <span class="ptog" onclick="togglePanel('p-care','b-care')">▸</span></div>
-  <div id="b-care" style="display:none">
-    <div id="cg-iwm" style="font-size:10px; color:var(--t2); margin-bottom:8px;"></div>
-    <div class="grid-2" id="cg-grid"></div>
-  </div>
+  <div class="panel-title" onclick="togglePanel('p-care','cg-grid')"><span>Relationship</span> <span class="ptog">▸</span></div>
+  <div class="grid-2" id="cg-grid" style="display:none"></div>
+  <div id="cg-iwm" style="font-size:9px; color:var(--t3); padding:5px;"></div>
 </div>
 
 <div class="panel" id="p-temp">
-  <div class="panel-title"><span>Temperament (DNA)</span> <span class="ptog" onclick="togglePanel('p-temp','b-temp')">▸</span></div>
-  <div class="grid-2" id="b-temp" style="display:none"></div>
+  <div class="panel-title" onclick="togglePanel('p-temp','temp-grid')"><span>Temperament</span> <span class="ptog">▸</span></div>
+  <div class="grid-2" id="temp-grid" style="display:none"></div>
 </div>
 
-<!-- TECHNICAL BACKGROUND ELEMENTS -->
-<div id="egrid"></div><div id="sem-grid"></div><div id="mem-list"></div><div id="need-row"></div><div id="schema-grid"></div>
-<div id="dn" style="display:none"></div><div id="bn" style="display:none"></div><div id="bs" style="display:none"></div>
-<div id="ts2" style="display:none"></div><div id="defn" style="display:none"></div><div id="defd" style="display:none"></div>
-<div id="def-style" style="display:none"></div><div id="tom-display" style="display:none"></div>
-<div id="sem-count" style="display:none"></div><div id="sem-plasticity" style="display:none"></div>
-<div id="schema-age" style="display:none"></div><div id="mem-count" style="display:none"></div>
+<div class="panel" id="p-core">
+  <div class="panel-title" onclick="togglePanel('p-core','schema-grid')"><span>Beliefs</span> <span class="ptog">▸</span></div>
+  <div class="grid-2" id="schema-grid" style="display:none"></div>
+</div>
+
+<!-- Technical placeholders -->
+<div id="egrid"></div><div id="sem-grid"></div><div id="mem-list"></div><div id="need-row"></div>
+<div id="dn"></div><div id="bn"></div><div id="bs"></div><div id="ts2"></div>
+<div id="defn"></div><div id="defd"></div><div id="def-style"></div>
+<div id="tom-display"></div><div id="sem-count"></div><div id="sem-plasticity"></div>
+<div id="schema-age"></div><div id="mem-count"></div>
 
 <script src="js/01-primes.js"></script>
 <script src="js/02-network.js"></script>
