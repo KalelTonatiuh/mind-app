@@ -82,12 +82,16 @@ function resetMind(){
 // ═══════════════════════════════════════════════════════
 // PANEL TOGGLE
 // ═══════════════════════════════════════════════════════
-function togglePanel(pid,bid){
-  const body=document.getElementById(bid);
-  const tog=document.querySelector(`#${pid} .ptog`);
-  if(body.style.display==='none'){body.style.display='';tog.textContent='▾';}
-  else{body.style.display='none';tog.textContent='▸';}
+function togglePanel(pid, bid) {
+  const body = document.getElementById(bid);
+  const parent = document.getElementById(pid);
+  const tog = parent.querySelector('.ptog'); // Find the button inside the panel
+  
+  if (body.style.display === 'none') {
+    body.style.display = 'grid'; // Use grid for the stat cards
+    if (tog) tog.textContent = '▾';
+  } else {
+    body.style.display = 'none';
+    if (tog) tog.textContent = '▸';
+  }
 }
-
-// Bootstrap
-init();
