@@ -27,8 +27,12 @@ function render(){
   setEl('tv', tr.l);
   setEl('ts2', tr.s);
   setEl('dev-stage', dev.name);
-  setEl('dev-plasticity', (BODY.isAsleep ? 'SLEEPING' : 'AWAKE') + ' · ' + (BODY.fatigue > 70 ? 'Exhausted' : BODY.fatigue > 30 ? 'Tired' : 'Rested'));
-
+// Find this section in your render() function:
+  setEl('dev-plasticity', 
+    (BODY.isAsleep ? 'SLEEPING' : 'AWAKE') + ' · ' + 
+    (BODY.fatigue > 70 ? 'Exhausted' : BODY.fatigue > 30 ? 'Tired' : 'Rested') + ' · ' +
+    HEARTBREAK.stage // ADD THIS HERE
+  );
   // 3. Emotion Bars
   const egrid = document.getElementById('egrid');
   if(egrid) {

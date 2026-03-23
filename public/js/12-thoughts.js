@@ -243,9 +243,10 @@ function generateThoughts(cat) {
 
   if(r()<0.12)sched({text:p(D.body),cls:'nv',tag:null,defKey:null,defColor:null},150);
 
+// Main thought
   const{text,cls,tag}=buildThought(dk,dv,blendEmo,blendRatio,def?def.def:null,isSocial);
+  applyAffectLabeling(dk); // ADD THIS LINE HERE
   sched({text,cls,tag,defKey:def?def.def:null,defColor:def?em.c:null},280+~~(r()*150));
-
   if(dev.langProb > 0.15){
     const past = retrieveNarrativeConsistentEpisode(dk);
     if(past&&r()<0.45){

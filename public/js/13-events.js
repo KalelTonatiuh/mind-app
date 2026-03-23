@@ -158,7 +158,9 @@ function parseInputSemantically(text) {
 // MAIN EVENT APPLICATION
 // ═══════════════════════════════════════════════════════
 function applyEffects(baseFx,cat,label,silent=false) {
+  checkPredictionError(baseFx, cat); // ADD THIS LINE HERE
   Object.keys(state).forEach(k=>prev[k]=state[k]);
+  // ... rest of code
   const tempFx = applyTemperament(baseFx);
   const fx={...tempFx};
   const isSocial = SOCIAL_CATS.has(cat);

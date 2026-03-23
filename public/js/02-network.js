@@ -55,7 +55,8 @@ function hebbianUpdate() {
   for(let i=0;i<active.length;i++) {
     for(let j=i+1;j<active.length;j++) {
       const a=active[i], b=active[j];
-      const delta=plasticity*a.activation*b.activation;
+   const windowMod = WINDOWS.language; // From our new file
+const delta = plasticity * a.activation * b.activation * windowMod;
       a.connections[b.id]=(a.connections[b.id]||0)+delta;
       b.connections[a.id]=(b.connections[a.id]||0)+delta;
       if(a.connections[b.id]>1)a.connections[b.id]=1;

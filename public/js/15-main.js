@@ -25,9 +25,15 @@ function init() {
 // ═══════════════════════════════════════════════════════
 setInterval(()=>{
   updateBody(); 
-  updateChemistry(); // ADD THIS LINE HERE
+  updateChemistry();
+  updateHeartbreak();
+  updateWindows(); // ADD THIS LINE HERE
+  
+  // ... rest of code
 
-  const decayRate = 0.88 + TEMP.effortControl * 0.08;
+  // ADD 'lastRegulationBonus' TO THIS MATH:
+  const decayRate = 0.88 + TEMP.effortControl * 0.08 + lastRegulationBonus; 
+  // ... rest of code
   // ... rest of your code
   const baseline = 5;
 

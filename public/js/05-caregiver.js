@@ -52,8 +52,7 @@ const IWM = {
   sampleCount: 0,
 };
 
-function updateIWM(responsiveness) {
-  const lr = Math.max(0.02, 0.15 * Math.exp(-IWM.sampleCount / 30));
+  const lr = 0.15 * getAttachmentPlasticity();
   const signal = responsiveness - 0.5;
   IWM.selfWorth  = Math.max(0, Math.min(1, IWM.selfWorth  + signal * lr * 0.8));
   IWM.otherTrust = Math.max(0, Math.min(1, IWM.otherTrust + signal * lr));
@@ -61,7 +60,7 @@ function updateIWM(responsiveness) {
   if(responsiveness > 0.55) CAREGIVER.respondedCount++;
   else CAREGIVER.missedCount++;
   CAREGIVER.totalInteractions++;
-}
+
 
 // Adult IWM updates — much slower, confirmation-biased
 // (Kirkpatrick & Hazan / Davila 1999, Chopik 2024)
