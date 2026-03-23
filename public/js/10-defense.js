@@ -1,72 +1,39 @@
-// ═══════════════════════════════════════════════════════
-// DEFENSE MECHANISMS (Cramer 2015, Vaillant 1992)
-// Defenses used repeatedly become characteristic style.
-// Attachment style biases initial selection.
-// ═══════════════════════════════════════════════════════
-const DEFENSE_USAGE = {
-  'Repression':          0,
-  'Denial':              0,
-  'Reaction formation':  0,
-  'Regression':          0,
-  'Compensation':        0,
-  'Projection':          0,
-  'Displacement':        0,
-  'Intellectualization': 0,
-};
+// 10-defense.js - Mature vs Primitive Defense
+function getDefense() {
+    const [dk, dv] = dominant();
+    if (dv < 50) return null;
 
-function getAttachmentDefenseBias() {
-  const att = getAttachmentStyle();
-  const biases = {
-    'Secure':       { 'Compensation':0.3, 'Denial':0.1, 'Displacement':0.1 },
-    'Avoidant':     { 'Repression':0.6, 'Intellectualization':0.5, 'Denial':0.4 },
-    'Anxious':      { 'Projection':0.5, 'Displacement':0.4, 'Reaction formation':0.4 },
-    'Disorganized': { 'Regression':0.4, 'Projection':0.3, 'Repression':0.3 },
-    'Insecure':     { 'Displacement':0.3, 'Repression':0.2 },
-    'Forming':      {},
-  };
-  return biases[att.name] || {};
-}
-
-function selectDefense(dominantEmoKey, intensity) {
-  if(intensity < 55) return null;
-  const allDefenses = Object.keys(DEFENSE_USAGE);
-  const attachBias = getAttachmentDefenseBias();
-  const emotionDefault = EM[dominantEmoKey]?.def;
-  const weights = {};
-  allDefenses.forEach(def => {
-    let w = 0.5;
-    const uses = DEFENSE_USAGE[def];
-    w += uses * 0.15;
-    if(attachBias[def]) w += attachBias[def];
-    if(def === emotionDefault) w += 0.8;
-    weights[def] = Math.max(0, w);
-  });
-  const total = Object.values(weights).reduce((a,b)=>a+b, 0);
-  let rand = Math.random() * total;
-  for(const [def, w] of Object.entries(weights)) {
-    rand -= w;
-    if(rand <= 0) {
-      DEFENSE_USAGE[def]++;
-      const em = Object.values(EM).find(e=>e.def===def) || EM[dominantEmoKey];
-      return { def, dd: em?.dd || '', c: em?.c || '#888', key: dominantEmoKey };
+    // FEATURE: Sublimation (Mature Defense)
+    // If high anger/sadness but high competence need, turn it into work
+    if (NEEDS.competence.val < 40 && (dk === 'anger' || dk === 'sadness') && dv > 70) {
+        sublimate(dk);
+        return { def: "Sublimation", c: "#4a9e6b" };
     }
-  }
-  DEFENSE_USAGE[emotionDefault]++;
-  return { def: emotionDefault, dd: EM[dominantEmoKey]?.dd||'', c: EM[dominantEmoKey]?.c||'#888', key: dominantEmoKey };
+
+    // FEATURE: Shadow Dynamics (Repression)
+    // High fear/disgust leads to "Shadowing" a concept
+    if (dk === 'disgust' && dv > 80) {
+        repressShadow();
+        return { def: "Repression", c: "#a84040" };
+    }
+
+    return { def: EM[dk].def, c: EM[dk].c };
 }
 
-function getDefense(){const[k,v]=dominant();return selectDefense(k,v);}
+function sublimate(emo) {
+    CHEM.dopamine = Math.min(1, CHEM.dopamine + 0.4);
+    NEEDS.competence.val = Math.min(100, NEEDS.competence.val + 20);
+    sched({text: `pouring my ${emo} into creation...`, cls: 'need'}, 200);
+}
 
-function applyDefense(def,text){
-  switch(def){
-    case 'Repression':          return text.split(/\s+/).slice(0,~~(text.split(/\s+/).length*0.6)).join(' ')+'—';
-    case 'Displacement':        return text+' '+p(['the light in here','something else','never mind']);
-    case 'Projection':          return text.replace(/\bi\b/g,'they').replace(/\bmy\b/g,'their');
-    case 'Denial':              return p(['fine','it\'s fine','not happening','completely fine']);
-    case 'Intellectualization': return p(['probably just','objectively,','the pattern here is'])+' '+text;
-    case 'Regression':          return p(['don\'t want to','make it stop','too much'])+' '+text.split(/\s+/).slice(0,2).join(' ');
-    case 'Compensation':        return text+' '+p(['work harder','prove it','show them']);
-    case 'Reaction formation':  return p(['fine actually','don\'t care','glad, even','not bothered']);
-    default:return text;
-  }
+function repressShadow() {
+    // Pick the most active non-prime node and hide it
+    let top = Object.values(nodes)
+        .filter(n => !n.isPrime && n.activation > 0.4 && !n.isHidden)
+        .sort((a,b) => b.activation - a.activation)[0];
+    
+    if (top) {
+        top.isHidden = true; // FEATURE: Shadow node physically hidden from UI and activation
+        sched({text: `I don't want to think about ${top.id.toLowerCase()}...`, cls: 'rum'}, 100);
+    }
 }

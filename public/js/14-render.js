@@ -1,150 +1,88 @@
+// 14-render.js - High-Density Dashboard Engine
 function friendly(val) {
-  if (val > 0.75) return "Very High";
-  if (val > 0.55) return "High";
-  if (val > 0.4) return "Moderate";
-  if (val > 0.2) return "Low";
-  return "Very Low";
+    if (val > 0.75) return "Very High";
+    if (val > 0.55) return "High";
+    if (val > 0.4) return "Moderate";
+    if (val > 0.2) return "Low";
+    return "Very Low";
 }
 
-function render(){
-  const[dk,dv]=dominant(),em=EM[dk];
-  const tr=getTrend(),dev=getDevStage(),def=getDefense();
+function render() {
+    const [dk, dv] = dominant();
+    const em = EM[dk];
+    const tr = getTrend();
+    const dev = getDevStage();
+    const cogState = getCognitiveState(); 
 
-  // --- ADD THIS LINE HERE ---
-  const cogState = getCognitiveState(); 
-  const stateColor = cogState === 'Flooded' ? '#a84040' : cogState === 'Depleted' ? '#8b6914' : 'var(--t)';
-
-  const setEl = (id, txt) => { const el = document.getElementById(id); if(el) el.textContent = txt; };
-  
-  setEl('ds', em.label);
-  setEl('dn', tier(dk,dv));
-  setEl('tv', tr.l);
-  setEl('ts2', tr.s);
-  
-  const devStageEl = document.getElementById('dev-stage');
-  if(devStageEl) {
-    devStageEl.textContent = `${dev.name} [${cogState}]`;
-    devStageEl.style.color = stateColor;
-  }
-
-  // Rest of the code...
-
-  setEl('dev-plasticity', 
-    (BODY.isAsleep ? 'SLEEPING' : 'AWAKE') + ' · ' + 
-    (BODY.fatigue > 70 ? 'Exhausted' : 'Rested') + ' · ' +
-    `C:${Math.round(CHEM.cortisol*100)} O:${Math.round(CHEM.oxytocin*100)} · ` +
-    HEARTBREAK.stage
-  );
-  // 3. Emotion Bars
-  const egrid = document.getElementById('egrid');
-  if(egrid) {
-    egrid.innerHTML = '';
-    Object.entries(EM).forEach(([k,e])=>{
-        const v = Math.round(state[k]);
-        const el = document.createElement('div'); el.className='ebar';
-        el.innerHTML = `<div class="el">${e.label}</div><div class="ei">${tier(k,v)}</div><div class="et"><div class="ef" style="width:${v}%;background:${e.c}"></div></div><div class="ev">${v}</div>`;
-        egrid.appendChild(el);
-    });
-  }
-
-  // 4. Color-Coded Memory & Abstracted Beliefs
-  const mlist = document.getElementById('mem-list');
-  if(mlist) {
-    mlist.innerHTML = '';
-    // Individual Episodes (Fainted & Color-coded by emotion)
-    episodicMemory.forEach(ep => {
-      const el = document.createElement('div'); 
-      el.className = 'mem-item';
-      const emoColor = EM[ep.emo]?.c || '#666';
-      el.style.color = emoColor; 
-      el.innerHTML = `<div class="mem-dot" style="background:${emoColor}"></div> <span>${ep.label}</span>`;
-      mlist.appendChild(el);
-    });
-    // Abstracted Beliefs (Stars)
-    const beliefs = Object.values(semanticBeliefs);
-    if(beliefs.length > 0) {
-      mlist.innerHTML += `<div style="margin: 12px 0 6px; font-size: 8px; color: var(--t3); font-family: var(--m); letter-spacing: 1px;">ABSTRACTED BELIEFS</div>`;
-      beliefs.forEach(b => {
-        const el = document.createElement('div'); 
-        el.className = 'mem-item';
-        el.style.color = b.color;
-        el.style.fontStyle = 'italic';
-        el.innerHTML = `<div class="mem-dot" style="background:${b.color}"></div> <span>★ ${b.label} (${friendly(b.strength)})</span>`;
-        mlist.appendChild(el);
-      });
+    // Update Header & Status
+    const setEl = (id, txt) => { const el = document.getElementById(id); if(el) el.textContent = txt; };
+    setEl('ds', em.label);
+    setEl('dn', tier(dk, dv));
+    setEl('tv', tr.l);
+    
+    const devStageEl = document.getElementById('dev-stage');
+    if(devStageEl) {
+        devStageEl.textContent = `${dev.name} [${cogState}]`;
+        devStageEl.style.color = cogState === 'Flooded' ? '#a84040' : 'var(--t)';
     }
-  }
-  setEl('mem-count', `${episodicMemory.length} eps, ${Object.keys(semanticBeliefs).length} beliefs`);
 
-  // 5. Psychological Needs (Friendly Text)
-  const ngrid = document.getElementById('need-row');
-  if(ngrid) {
-    ngrid.innerHTML = '';
-    Object.values(NEEDS).forEach(n => {
-        const el = document.createElement('div'); el.className='need-item';
-        el.innerHTML = `<div class="need-label">${n.label}: ${friendly(n.val/100)}</div><div class="need-track"><div class="need-fill" style="width:${n.val}%;background:${n.color}"></div></div>`;
-        ngrid.appendChild(el);
-    });
-  }
+    setEl('dev-plasticity', 
+        (BODY.isAsleep ? 'SLEEPING' : 'AWAKE') + ' · ' + 
+        `C:${Math.round(CHEM.cortisol*100)} O:${Math.round(CHEM.oxytocin*100)} · ` +
+        `Time: ${Math.floor(BODY.clock)}:00`
+    );
 
-  // 6. Caregiver & Attachment (Friendly Text)
-  const cgrid = document.getElementById('cg-grid');
-  if(cgrid) {
-    cgrid.innerHTML = `<div class="tbar"><div class="tbar-label">Stress: ${friendly(CAREGIVER.stress)}</div><div class="tbar-track"><div class="tbar-fill" style="width:${CAREGIVER.stress*100}%;background:#a84040"></div></div></div>` +
-                      `<div class="tbar"><div class="tbar-label">Mood: ${friendly(CAREGIVER.mood)}</div><div class="tbar-track"><div class="tbar-fill" style="width:${CAREGIVER.mood*100}%;background:#4a9e6b"></div></div></div>`;
-  }
-  const iwm = document.getElementById('cg-iwm');
-  const att = getAttachmentStyle();
-  if(iwm) iwm.innerHTML = `<span style="color:${att.color}">${att.name}</span>: ${att.desc}`;
+    // FEATURE: Life Timeline Visualizer
+    const tl = document.getElementById('life-timeline');
+    if (tl) {
+        tl.innerHTML = episodicMemory.slice(0, 12).map(ep => `
+            <div style="min-width:120px; border-left:1px solid var(--b); padding:5px; font-size:9px;">
+                <div style="color:var(--t3); font-family:var(--m);">EVENT</div>
+                <div style="color:${EM[ep.emo].c}">${ep.label}</div>
+            </div>
+        `).join('');
+    }
 
-  // 7. Temperament (Friendly Text)
-  const tgrid = document.getElementById('temp-grid');
-  if(tgrid) {
-    tgrid.innerHTML = '';
-    const defs = [{k:'negAffect', l:'Sensitivity'}, {k:'surgency', l:'Sociability'}, {k:'effortControl', l:'Regulation'}, {k:'orientSens', l:'Curiosity'}];
-    defs.forEach(d => {
-        const val = TEMP[d.k];
-        const el = document.createElement('div'); el.className='tbar';
-        el.innerHTML = `<div class="tbar-label">${d.l}: ${friendly(val)}</div><div class="tbar-track"><div class="tbar-fill" style="width:${val*100}%;background:#5b7fc4"></div></div>`;
-        tgrid.appendChild(el);
-    });
-  }
+    // FEATURE: Semantic Map Canvas
+    const canvas = document.getElementById('semantic-map');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        let active = Object.values(nodes).filter(n => n.activation > 0.05 && !n.isHidden);
+        active.forEach((n, i) => {
+            let x = 50 + (i * 60) % (canvas.width - 100);
+            let y = 30 + (i * 20) % (canvas.height - 60);
+            ctx.fillStyle = n.isBelief ? '#4a9e6b' : `rgba(255,255,255,${n.activation})`;
+            ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2); ctx.fill();
+            ctx.font = '9px Courier New';
+            ctx.fillText(n.id.toLowerCase(), x+8, y+3);
+        });
+    }
 
-  // 8. Formatted Core Beliefs (Schemas)
-  const sgrid = document.getElementById('schema-grid');
-  if(sgrid) {
-    sgrid.innerHTML = '';
-    Object.values(SCHEMAS).forEach(s => {
-        if(s.strength < 0.05) return;
-        const el = document.createElement('div'); 
-        el.className = 'si ' + (s.valence > 0 ? 'pos' : 'neg');
-        el.innerHTML = `
-          <div class="sl">${s.label}</div>
-          <div class="st"><div class="sf" style="width:${s.strength*100}%;background:${s.color}"></div></div>
-        `;
-        sgrid.appendChild(el);
-    });
-  }
+    // Render Emotion Bars
+    const egrid = document.getElementById('egrid');
+    if(egrid) {
+        egrid.innerHTML = '';
+        Object.entries(EM).forEach(([k, e]) => {
+            const v = Math.round(state[k]);
+            const el = document.createElement('div'); el.className = 'ebar';
+            el.innerHTML = `<div class="el">${e.label}</div><div class="et"><div class="ef" style="width:${v}%;background:${e.c}"></div></div>`;
+            egrid.appendChild(el);
+        });
+    }
 
-  // 9. Semantic Network Cloud
-  const semGrid = document.getElementById('sem-grid');
-  if(semGrid) {
-    semGrid.innerHTML = '';
-    Object.values(nodes).filter(n => n.activation > 0.08 || n.isBelief).forEach(n => {
-        const el = document.createElement('div'); el.className = 'sem-node';
-        const alpha = Math.max(0.1, n.activation * 0.5);
-        el.style.background = n.isBelief ? 'rgba(68,148,188,0.2)' : `rgba(255,255,255,${alpha})`;
-        el.textContent = (n.isBelief ? '★ ' : '') + n.id.toLowerCase();
-        semGrid.appendChild(el);
-    });
-  }
+    // Render Needs
+    const ngrid = document.getElementById('need-row');
+    if(ngrid) {
+        ngrid.innerHTML = '';
+        Object.entries(NEEDS).filter(([k])=> k!=='drives').forEach(([k, n]) => {
+            const el = document.createElement('div'); el.className = 'need-item';
+            el.innerHTML = `<div class="need-label">${n.label}</div><div class="need-track"><div class="need-fill" style="width:${n.val}%;background:${n.color}"></div></div>`;
+            ngrid.appendChild(el);
+        });
+    }
 
-  // 10. ToM & Defense
-  setEl('defn', def ? def.def : 'none');
-  const dStyle = document.getElementById('def-style');
-  if(dStyle) {
-    const topDef = Object.entries(DEFENSE_USAGE).sort((a,b)=>b[1]-a[1])[0];
-    dStyle.textContent = topDef && topDef[1] > 0 ? `Style: ${topDef[0]}` : "Style forming...";
-  }
-  setEl('tom-display', tomState ? tomState.label : 'no other-modeling yet');
+    // Caregiver & ToM
+    setEl('defn', getDefense()?.def || 'none');
+    setEl('tom-display', tomState ? tomState.label : 'no social modeling');
 }

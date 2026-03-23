@@ -1,21 +1,23 @@
-// ═══════════════════════════════════════════════════════
-// SYNAPTIC PRUNING (Adolescent Hardening)
-// ═══════════════════════════════════════════════════════
+// 23-pruning.js - Synaptic Pruning (Adolescent Hardening)
 function runSynapticPruning() {
-  // Pruning begins after the Mind has significant experience
-  if (eventCount < 300) return;
+    // Pruning starts after the mind has consolidated significant data
+    if (eventCount < 300) return;
 
-  Object.values(nodes).forEach(n => {
-    Object.keys(n.connections).forEach(target => {
-      const strength = n.connections[target];
-      
-      // If a connection is weak (< 0.1), it is deleted forever
-      if (strength < 0.1 && !nodes[target]?.isPrime) {
-        delete n.connections[target];
-      } else {
-        // Strong connections become even stronger and more rigid
-        n.connections[target] = Math.min(1, n.connections[target] + 0.01);
-      }
+    Object.values(nodes).forEach(n => {
+        // Pruning does not affect Primes (Biological constants)
+        if (n.isPrime) return;
+
+        Object.keys(n.connections).forEach(target => {
+            const weight = n.connections[target];
+            
+            if (weight < 0.1) {
+                // FEATURE: Personality Hardening
+                // If a connection is weak, it is deleted forever
+                delete n.connections[target];
+            } else {
+                // Strong connections become even stronger (Heidigger's "Throwness")
+                n.connections[target] = Math.min(1, n.connections[target] + 0.005);
+            }
+        });
     });
-  });
 }

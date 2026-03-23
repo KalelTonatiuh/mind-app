@@ -1,54 +1,28 @@
-// ═══════════════════════════════════════════════════════
-// BODY STATE & CIRCADIAN GATING
-// ═══════════════════════════════════════════════════════
+// 16-body.js - Somatic State & Clock
 const BODY = {
-  hunger: 10,     // 0-100
-  fatigue: 10,    // 0-100
-  isAsleep: false,
-  cycleTick: 0    // Tracks day/night
+    hunger: 10,
+    fatigue: 10,
+    somaticDamage: 0,
+    clock: 8.0, // 0-24
+    isAsleep: false
 };
 
 function updateBody() {
-  // Hunger and fatigue grow naturally over time
-  BODY.hunger = Math.min(100, BODY.hunger + 1.5);
-  BODY.fatigue = Math.min(100, BODY.fatigue + 1.2);
-  BODY.cycleTick++;
-
-  // 24-tick cycle (approx 1.8 minutes real time)
-  // Ticks 0-15: Awake | Ticks 16-23: Asleep
-  if (BODY.cycleTick > 23) BODY.cycleTick = 0;
-  
-  const previouslyAsleep = BODY.isAsleep;
-  BODY.isAsleep = BODY.cycleTick >= 16;
-
-  if (BODY.isAsleep) {
-    // While sleeping, hunger grows slower, fatigue drops fast
-    BODY.hunger -= 0.5; 
-    BODY.fatigue = Math.max(0, BODY.fatigue - 8);
+    // 1. Circadian Cycle (0.5 hours per tick)
+    BODY.clock = (BODY.clock + 0.5) % 24;
+    BODY.isAsleep = (BODY.clock > 22 || BODY.clock < 6);
     
-    // Boost memory processing during sleep
-    for (let i = 0; i < 3; i++) {
-      offlineConsolidation();
+    // Melatonin peaks in dark hours
+    CHEM.melatonin = (BODY.clock > 21 || BODY.clock < 7) ? 0.8 : 0.1;
+
+    // 2. Metabolic Decay influenced by Somatic Illness
+    // High damage = faster fatigue, slower recovery
+    let illnessPenalty = 1 + (BODY.somaticDamage * 2.5);
+    
+    if (!BODY.isAsleep) {
+        BODY.hunger = Math.min(100, BODY.hunger + 1.2 * illnessPenalty);
+        BODY.fatigue = Math.min(100, BODY.fatigue + 1.0 * illnessPenalty);
+    } else {
+        BODY.fatigue = Math.max(0, BODY.fatigue - (10 / illnessPenalty));
     }
-  }
-
-  applySomaticMarkers();
-}
-
-// How the body changes the mind's math
-function applySomaticMarkers() {
-  // If very hungry, Anger baseline rises (irritability)
-  if (BODY.hunger > 70) {
-    state.anger = Math.min(100, state.anger + (BODY.hunger - 70) * 0.1);
-  }
-  
-  // If very tired, Coping ability drops (everything feels harder)
-  if (BODY.fatigue > 60) {
-    Object.values(SCHEMAS).forEach(s => {
-      if (s.bias) {
-        // High fatigue makes negative biases 20% stronger
-        s.strength = Math.min(1, s.strength + 0.001);
-      }
-    });
-  }
 }
