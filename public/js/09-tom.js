@@ -95,6 +95,8 @@ function biasedToMAttribution(profile, depth) {
 
 function getToMWords(profile, depth) {
   if(!profile) return null;
+   const functionalDepth = getFunctionalToMDepth(); 
+  depth = functionalDepth; 
   const intent = profile.intent || 'impersonal';
   const knew = profile.knew;
   if(depth >= 7) return TOM_WORDS.d7_any;

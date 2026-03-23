@@ -26,13 +26,17 @@ function render(){
   setEl('dn', tier(dk,dv));
   setEl('tv', tr.l);
   setEl('ts2', tr.s);
-  setEl('dev-stage', dev.name);
-// Find this section in your render() function:
+   const devStageEl = document.getElementById('dev-stage');
+  if(devStageEl) {
+    devStageEl.textContent = `${dev.name} [${cogState}]`;
+    devStageEl.style.color = stateColor; // Changes color based on stress
+  }
+
   setEl('dev-plasticity', 
     (BODY.isAsleep ? 'SLEEPING' : 'AWAKE') + ' · ' + 
-    (BODY.fatigue > 70 ? 'Exhausted' : BODY.fatigue > 30 ? 'Tired' : 'Rested') + ' · ' +
-      `C:${Math.round(CHEM.cortisol*100)} O:${Math.round(CHEM.oxytocin*100)}`
-    ,HEARTBREAK.stage // ADD THIS HERE
+    (BODY.fatigue > 70 ? 'Exhausted' : 'Rested') + ' · ' +
+    `C:${Math.round(CHEM.cortisol*100)} O:${Math.round(CHEM.oxytocin*100)} · ` +
+    HEARTBREAK.stage
   );
   // 3. Emotion Bars
   const egrid = document.getElementById('egrid');
