@@ -107,8 +107,9 @@ function togglePanel(pid, bid) {
 function init() {
   buildNetwork();
   initEventButtons();
-  document.getElementById('ci').addEventListener('keydown', e => { if(e.key === 'Enter') sendCustom(); });
+  const ci = document.getElementById('ci');
+  if(ci) ci.addEventListener('keydown', e => { if(e.key === 'Enter') sendCustom(); });
   render();
 }
 
-init(); // Start it up
+init();

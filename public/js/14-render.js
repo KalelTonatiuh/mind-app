@@ -10,27 +10,24 @@ function render(){
   const[dk,dv]=dominant(),em=EM[dk];
   const tr=getTrend(),dev=getDevStage(),def=getDefense();
 
-  // 1. Header & Identity
-  const av = document.getElementById('av');
-  if(av) { 
-    av.textContent = em.icon; 
-    av.style.borderColor = em.c+'88'; 
-    av.style.opacity = BODY.isAsleep ? '0.3' : '1'; 
-  }
-  const status = document.getElementById('status');
-  if(status) status.textContent = `${FUNC[dk]} — ${dev.desc} (${eventCount} events)` + (NARRATIVE_SELF.strength > 0.2 ? ' · "'+p(NARRATIVE_SELF.phrases)+'"' : '');
+  // --- ADD THIS LINE HERE ---
+  const cogState = getCognitiveState(); 
+  const stateColor = cogState === 'Flooded' ? '#a84040' : cogState === 'Depleted' ? '#8b6914' : 'var(--t)';
 
-  // 2. State Cards
   const setEl = (id, txt) => { const el = document.getElementById(id); if(el) el.textContent = txt; };
+  
   setEl('ds', em.label);
   setEl('dn', tier(dk,dv));
   setEl('tv', tr.l);
   setEl('ts2', tr.s);
-   const devStageEl = document.getElementById('dev-stage');
+  
+  const devStageEl = document.getElementById('dev-stage');
   if(devStageEl) {
     devStageEl.textContent = `${dev.name} [${cogState}]`;
-    devStageEl.style.color = stateColor; // Changes color based on stress
+    devStageEl.style.color = stateColor;
   }
+
+  // Rest of the code...
 
   setEl('dev-plasticity', 
     (BODY.isAsleep ? 'SLEEPING' : 'AWAKE') + ' · ' + 
