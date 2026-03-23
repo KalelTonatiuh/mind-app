@@ -1,92 +1,98 @@
+function friendly(val) {
+  if (val > 0.8) return "Very High";
+  if (val > 0.6) return "High";
+  if (val > 0.4) return "Moderate";
+  if (val > 0.2) return "Low";
+  return "Very Low";
+}
+
 function render(){
   const[dk,dv]=dominant(),em=EM[dk];
-  const d=getDyad(),def=getDefense(),tr=getTrend(),dev=getDevStage();
+  const tr=getTrend(),dev=getDevStage(),def=getDefense();
 
-  // Avatar and Status
-  document.getElementById('av').textContent=em.icon;
-  document.getElementById('av').style.borderColor=em.c+'88';
-  document.getElementById('av').style.opacity = BODY.isAsleep ? '0.3' : '1';
-  document.getElementById('status').textContent= (NARRATIVE_SELF.strength > 0.2 ? ' "'+p(NARRATIVE_SELF.phrases)+'"' : FUNC[dk]);
+  const setT = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  const setH = (id, val) => { const el = document.getElementById(id); if(el) el.innerHTML = val; };
 
-  // State Cards
-  document.getElementById('ds').textContent=em.label;
-  document.getElementById('dn').textContent=tier(dk,dv);
-  document.getElementById('tv').textContent=tr.l;
-  document.getElementById('ts2').textContent=tr.s;
-  document.getElementById('dev-stage').textContent=dev.name;
+  setT('ds', em.label);
+  setT('dn', tier(dk,dv));
+  setT('tv', tr.l);
+  setT('ts2', tr.s);
+  setT('dev-stage', dev.name);
+  setT('status', (NARRATIVE_SELF.strength > 0.2 ? '"'+p(NARRATIVE_SELF.phrases)+'"' : FUNC[dk]));
   
-  // Body Stats in the Identity Card
-  document.getElementById('dev-plasticity').textContent = 
-    (BODY.isAsleep ? 'SLEEPING' : 'AWAKE') + ' · ' +
-    (BODY.fatigue > 70 ? 'Exhausted' : BODY.fatigue > 30 ? 'Tired' : 'Rested');
+  const av = document.getElementById('av');
+  if(av){ av.textContent = em.icon; av.style.borderColor = em.c+'88'; av.style.opacity = BODY.isAsleep ? '0.3' : '1'; }
+
+  setH('dev-plasticity', (BODY.isAsleep ? 'SLEEPING' : 'AWAKE') + ' · ' + (BODY.fatigue > 70 ? 'Exhausted' : BODY.fatigue > 30 ? 'Tired' : 'Rested'));
 
   // Emotion Bars
-  const g=document.getElementById('egrid');g.innerHTML='';
-  Object.entries(EM).forEach(([k,e])=>{
-    const v=Math.round(state[k]);
-    const el=document.createElement('div');el.className='ebar';
-    el.innerHTML=`<div class="el">${e.label}</div><div class="ei">${tier(k,v)}</div>
-      <div class="et"><div class="ef" style="width:${v}%;background:${e.c}"></div></div>
-      <div class="ev">${v}</div>`;
-    g.appendChild(el);
-  });
+  const egrid = document.getElementById('egrid');
+  if(egrid) {
+    egrid.innerHTML = '';
+    Object.entries(EM).forEach(([k,e])=>{
+        const v = Math.round(state[k]);
+        const el = document.createElement('div'); el.className='ebar';
+        el.innerHTML = `<div class="el">${e.label}</div><div class="ei">${tier(k,v)}</div><div class="et"><div class="ef" style="width:${v}%;background:${e.c}"></div></div><div class="ev">${v}</div>`;
+        egrid.appendChild(el);
+    });
+  }
 
   // Semantic Grid
- // Semantic Grid Update
-  const sg=document.getElementById('sem-grid'); sg.innerHTML='';
-  Object.values(nodes)
-    .filter(n => n.activation > 0.05 || n.isBelief) // Show beliefs too
-    .sort((a,b) => b.activation - a.activation)
-    .slice(0, 40) // Keep it dense but not overwhelming
-    .forEach(n=>{
-      const el=document.createElement('div'); el.className='sem-node';
-      // Make Belief nodes stand out with a border
-      if (n.isBelief) el.style.border = '1px solid #4494bc'; 
-      el.style.background = `rgba(255,255,255,${Math.max(0.1, n.activation * 0.4)})`;
-      el.textContent=n.id.toLowerCase().replace('belief_', '★ ');
-      sg.appendChild(el);
+  const sgrid = document.getElementById('sem-grid');
+  if(sgrid) {
+    sgrid.innerHTML = '';
+    Object.values(nodes).forEach(n => {
+        const el = document.createElement('div'); el.className='sem-node';
+        const alpha = n.activation > 0.1 ? 0.3 : 0.05;
+        el.style.background = n.isBelief ? 'rgba(68,148,188,0.2)' : `rgba(255,255,255,${alpha})`;
+        el.textContent = (n.isBelief ? '★ ' : '') + n.id.toLowerCase();
+        sgrid.appendChild(el);
     });
+  }
 
-  // Caregiver Panel
-  const cgg = document.getElementById('cg-grid'); cgg.innerHTML='';
-  [{l:'Stress',v:CAREGIVER.stress,c:'#a84040'},{l:'Mood',v:CAREGIVER.mood,c:'#4a9e6b'}].forEach(item => {
-    const el = document.createElement('div'); el.className='tbar';
-    const pct = Math.round(item.v * 100);
-    el.innerHTML=`<div class="tbar-label">${item.l}</div><div class="tbar-track"><div class="tbar-fill" style="width:${pct}%;background:${item.c}"></div></div>`;
-    cgg.appendChild(el);
-  });
-  document.getElementById('cg-iwm').textContent = getAttachmentStyle().name + ': ' + getAttachmentStyle().desc;
+  // Caregiver
+  const cgrid = document.getElementById('cg-grid');
+  if(cgrid) {
+    cgrid.innerHTML = `<div class="tbar"><div class="tbar-label">Stress: ${friendly(CAREGIVER.stress)}</div><div class="tbar-track"><div class="tbar-fill" style="width:${CAREGIVER.stress*100}%;background:#a84040"></div></div></div>` +
+                      `<div class="tbar"><div class="tbar-label">Mood: ${friendly(CAREGIVER.mood)}</div><div class="tbar-track"><div class="tbar-fill" style="width:${CAREGIVER.mood*100}%;background:#4a9e6b"></div></div></div>`;
+  }
+  setT('cg-iwm', getAttachmentStyle().name + ': ' + getAttachmentStyle().desc);
 
-  // Temperament Panel
-  const tg = document.getElementById('temp-grid'); tg.innerHTML='';
-  Object.entries(TEMP).forEach(([k,v]) => {
-    if(k==='noiseFloor') return;
-    const el = document.createElement('div'); el.className='tbar';
-    el.innerHTML=`<div class="tbar-label">${k}</div><div class="tbar-track"><div class="tbar-fill" style="width:${Math.round(v*100)}%;background:#5b7fc4"></div></div>`;
-    tg.appendChild(el);
-  });
+  // Temperament
+  const tgrid = document.getElementById('temp-grid');
+  if(tgrid) {
+    tgrid.innerHTML = '';
+    Object.entries(TEMP).forEach(([k,v]) => {
+        if(k==='noiseFloor') return;
+        const el = document.createElement('div'); el.className='tbar';
+        el.innerHTML = `<div class="tbar-label">${k}: ${friendly(v)}</div><div class="tbar-track"><div class="tbar-fill" style="width:${v*100}%;background:#5b7fc4"></div></div>`;
+        tgrid.appendChild(el);
+    });
+  }
 
-  // Needs Row
-  const nr=document.getElementById('need-row');nr.innerHTML='';
-  Object.values(NEEDS).forEach(n=>{
-    const el=document.createElement('div');el.className='need-item';
-    el.innerHTML=`<div class="need-label">${n.label}</div><div class="need-track"><div class="need-fill" style="width:${Math.round(n.val)}%;background:${n.color}"></div></div>`;
-    nr.appendChild(el);
-  });
+  // Needs
+  const ngrid = document.getElementById('need-row');
+  if(ngrid) {
+    ngrid.innerHTML = '';
+    Object.values(NEEDS).forEach(n => {
+        const el = document.createElement('div'); el.className='need-item';
+        el.innerHTML = `<div class="need-label">${n.label}</div><div class="need-track"><div class="need-fill" style="width:${n.val}%;background:${n.color}"></div></div>`;
+        ngrid.appendChild(el);
+    });
+  }
 
   // Schemas
-  const schg=document.getElementById('schema-grid');schg.innerHTML='';
-  Object.values(SCHEMAS).forEach(s=>{
-    if(s.strength < 0.1) return;
-    const el=document.createElement('div');el.className='si';
-    el.innerHTML=`<div class="sl">${s.label}</div><div class="st"><div class="sf" style="width:${Math.round(s.strength*100)}%;background:${s.color}"></div></div>`;
-    schg.appendChild(el);
-  });
+  const sgh = document.getElementById('schema-grid');
+  if(sgh) {
+    sgh.innerHTML = '';
+    Object.values(SCHEMAS).forEach(s => {
+        if(s.strength < 0.1) return;
+        const el = document.createElement('div'); el.className='si';
+        el.innerHTML = `<div class="sl">${s.label}</div><div class="st"><div class="sf" style="width:${s.strength*100}%;background:${s.color}"></div></div>`;
+        sgh.appendChild(el);
+    });
+  }
 
-  // Defense
-  document.getElementById('defn').textContent = def ? def.def : 'none';
-  document.getElementById('defn').style.color = def ? def.c : 'var(--t3)';
-  
-  // ToM
-  document.getElementById('tom-display').textContent = tomState ? tomState.label : 'no other-modeling yet';
+  setT('defn', def ? def.def : 'none');
+  setT('tom-display', tomState ? tomState.label : 'no social modeling yet');
 }

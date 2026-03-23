@@ -94,3 +94,12 @@ function togglePanel(pid, bid) {
     if (tog) tog.textContent = '▸';
   }
 }
+
+function init() {
+  buildNetwork();
+  initEventButtons();
+  document.getElementById('ci').addEventListener('keydown', e => { if(e.key === 'Enter') sendCustom(); });
+  render();
+}
+
+init(); // Start it up
