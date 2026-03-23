@@ -27,7 +27,9 @@ setInterval(()=>{
   updateBody(); 
   updateChemistry();
   updateHeartbreak();
-  updateWindows(); // ADD THIS LINE HERE
+  updateWindows();
+  updatePeers();
+  runSynapticPruning(); // ADD THIS LINE HERE
   
   // ... rest of code
 
