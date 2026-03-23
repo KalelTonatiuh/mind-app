@@ -7,6 +7,8 @@ const EVENT_PRIMES = {
     alone: { FAR: 0.8, DONTWANT: 0.7, SOMEONE: 0.5, NOT: 0.5 }
 };
 
+const SOCIAL_CATS = new Set(['kindness', 'betrayal', 'judged', 'alone', 'given trust']);
+
 const WORD_MAP = [
     { w: ['mom', 'mother', 'mama', 'parent'], p: { MOTHER: 0.9, SOMEONE: 0.5 } },
     { w: ['hit', 'hurt', 'pain', 'punch'], p: { PAIN: 0.9, BAD: 0.8 } },
@@ -14,52 +16,61 @@ const WORD_MAP = [
     { w: ['hug', 'hold', 'warm', 'soft'], p: { WARM: 0.8, GOOD: 0.5 } }
 ];
 
+// UI EVENT LIST (Restored for initEventButtons)
+const EVENTS = [
+  {l:'🏆 Goal achieved',      fx:{joy:32,trust:10,anticipation:12},cat:'achievement',lbl:'goal achieved'},
+  {l:'💔 Someone leaves',     fx:{sadness:38,anger:14,fear:10},   cat:'alone',       lbl:'someone left'},
+  {l:'👁️ Being judged',       fx:{fear:22,anticipation:18,anger:8},cat:'judged',     lbl:'being judged'},
+  {l:'🎁 Unexpected kindness',fx:{surprise:28,joy:18,trust:14},   cat:'kindness',    lbl:'unexpected kindness'},
+  {l:'🚨 Threat appears',     fx:{fear:38,anger:18,anticipation:12},cat:'threat',    lbl:'threat appeared'},
+  {l:'🤝 Given trust',        fx:{trust:32,anticipation:18,joy:10},cat:'given trust',lbl:'given responsibility'}
+];
+
+function initEventButtons() {
+  const eg = document.getElementById('evgrid');
+  if(!eg) return;
+  eg.innerHTML = '';
+  EVENTS.forEach(ev => {
+    const b = document.createElement('button');
+    b.className = 'evbtn';
+    b.textContent = ev.l;
+    b.onclick = () => applyEffects(ev.fx, ev.cat, ev.lbl);
+    eg.appendChild(b);
+  });
+}
+
 function parseInputSemantically(text) {
     const lower = text.toLowerCase();
     const seeds = {};
-    
     WORD_MAP.forEach(m => {
         if (m.w.some(word => lower.includes(word))) {
             Object.entries(m.p).forEach(([prime, val]) => seeds[prime] = (seeds[prime] || 0) + val);
         }
     });
-
     if (Object.keys(seeds).length === 0) return { fx: { surprise: 10 }, cat: 'sudden' };
-
     spreadActivation(seeds);
-    
-    // Categorize
     let cat = 'achievement';
     if (nodes['BAD']?.activation > 0.4) cat = 'threat';
     if (nodes['FAR']?.activation > 0.4) cat = 'alone';
     if (nodes['SOMEONE']?.activation > 0.4 && nodes['BAD']?.activation > 0.4) cat = 'betrayal';
     if (nodes['SOMEONE']?.activation > 0.4 && nodes['GOOD']?.activation > 0.4) cat = 'kindness';
 
-    // Simple FX mapping
     let fx = { joy: 0, fear: 0, trust: 0, sadness: 0 };
     if (cat === 'kindness') fx.trust = 25;
     if (cat === 'threat') fx.fear = 30;
     if (cat === 'alone') fx.sadness = 25;
     if (cat === 'achievement') fx.joy = 20;
-
     return { fx, cat };
 }
 
 function applyEffects(fx, cat, label) {
     const val = ['kindness', 'achievement', 'morning'].includes(cat) ? 1 : -1;
-    
     checkPredictionError(fx, val);
     updateChemistry(val);
 
-    // Social Feedback Loop
     if (SOCIAL_CATS.has(cat)) {
         let resp = getCaregiverResponsiveness();
         updateIWM(resp);
-        
-        // Introjection: Store the caregiver's reaction as a ghost voice
-        if (val < 0 && resp < 0.4) CAREGIVER.introjects.push("you're being too much");
-        if (val > 0 && resp > 0.6) CAREGIVER.introjects.push("I'm proud of you");
-        
         processToM(cat);
     }
 

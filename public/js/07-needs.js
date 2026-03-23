@@ -7,7 +7,9 @@ const NEEDS = {
 };
 
 function evaluateGoals() {
-    // Choose a "Life Theme" based on the most neglected need
+    // Fix: Check if NARRATIVE_SELF exists before using it
+    if (typeof NARRATIVE_SELF === 'undefined') return;
+
     let sorted = Object.entries(NEEDS)
         .filter(([k])=>k!=='drives')
         .sort((a,b) => a[1].val - b[1].val);
@@ -18,4 +20,11 @@ function evaluateGoals() {
         case 'competence': NARRATIVE_SELF.lifeTheme = "the need to achieve"; break;
         case 'relatedness': NARRATIVE_SELF.lifeTheme = "the search for connection"; break;
     }
+}
+
+function applyNeedEffects(cat, fx) {
+    evaluateGoals();
+    const needChanges = {};
+    // Impact logic...
+    return needChanges;
 }
