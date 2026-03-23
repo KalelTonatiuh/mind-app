@@ -64,26 +64,22 @@ const IWM = {
 
 // Adult IWM updates — much slower, confirmation-biased
 // (Kirkpatrick & Hazan / Davila 1999, Chopik 2024)
-function updateIWMFromAdultEvent(cat, caregiverResponsiveness) {
-  if(IWM.sampleCount < 5) return;
-  const consolidation = Math.min(1,
-    (Math.abs(IWM.otherTrust - 0.5) * 2) * 0.5 +
-    Math.min(IWM.sampleCount / 200, 0.5)
-  );
-  const lr = Math.max(0.003, 0.025 * (1 - consolidation * 0.7));
-  let signal = caregiverResponsiveness - 0.5;
-  const att = getAttachmentStyle();
-  if(att.name === 'Anxious') {
-    if(signal > 0) signal *= 0.3;
-    else signal *= 1.4;
-  } else if(att.name === 'Avoidant') {
-    signal *= 0.2;
-  } else if(att.name === 'Disorganized') {
-    signal += (Math.random() - 0.5) * 0.3;
-  }
+function updateIWM(responsiveness) {
+  const lr = 0.15 * getAttachmentPlasticity();
+  const signal = responsiveness - 0.5;
+  
   IWM.selfWorth  = Math.max(0, Math.min(1, IWM.selfWorth  + signal * lr * 0.8));
   IWM.otherTrust = Math.max(0, Math.min(1, IWM.otherTrust + signal * lr));
+  
   IWM.sampleCount++;
+  
+  if(responsiveness > 0.55) {
+    CAREGIVER.respondedCount++;
+  } else {
+    CAREGIVER.missedCount++;
+  }
+  
+  CAREGIVER.totalInteractions++;
 }
 
 // Derive attachment style from IWM (Ainsworth 1978)
