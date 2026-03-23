@@ -256,15 +256,17 @@ body {
 <div class="thought-stream" id="stream">
     <div class="thought nv"><span class="ts">—</span><span class="tx">pre-verbal. no concepts yet. only sensation.</span></div>
 </div>
+<!-- ═══════════════════════════════════════════════════════
+     THE 23-FILE BRAIN ARCHITECTURE (Corrected Dependency Order)
+     ═══════════════════════════════════════════════════════ -->
 
-<!-- THE 23-FILE BRAIN LOADER -->
-<!-- Foundations -->
+<!-- 1. Foundations -->
 <script src="js/01-primes.js"></script>
 <script src="js/02-network.js"></script>
 <script src="js/03-temperament.js"></script>
 <script src="js/04-emotions.js"></script>
 
-<!-- Biology -->
+<!-- 2. Biology (Must define Body/Chem/Trauma before they are called by Main Loop) -->
 <script src="js/16-body.js"></script>
 <script src="js/17-chemistry.js"></script>
 <script src="js/18-heartbreak.js"></script>
@@ -274,20 +276,21 @@ body {
 <script src="js/22-dualprocess.js"></script>
 <script src="js/23-pruning.js"></script>
 
-<!-- Psychology -->
-<script src="js/05-caregiver.js"></script>
+<!-- 3. Psychology (Must define Needs/Schemas/Memory before they are used by Thought Generation) -->
+<script src="js/05-caregiver.js"></script> <!-- Defines CAREGIVER & IWM -->
 <script src="js/06-schemas.js"></script>
 <script src="js/07-needs.js"></script>
-<script src="js/08-memory.js"></script>
+<script src="js/08-memory.js"></script> <!-- Defines episodicMemory & NARRATIVE_SELF -->
 <script src="js/11-development.js"></script>
 
-<!-- Social/Output -->
+<!-- 4. Social/Output & Thought Logic (Must define ToM, Defenses, Thoughts, Events before Main Loop) -->
 <script src="js/09-tom.js"></script>
 <script src="js/10-defense.js"></script>
 <script src="js/12-thoughts.js"></script>
-<script src="js/13-events.js"></script>
+<script src="js/13-events.js"></script> <!-- Defines sendCustom and initEventButtons -->
 <script src="js/14-render.js"></script>
-<script src="js/15-main.js"></script>
 
+<!-- 5. Global Loop (Calls ALL other modules) -->
+<script src="js/15-main.js"></script>
 </body>
 </html>
