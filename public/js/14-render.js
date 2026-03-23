@@ -12,7 +12,11 @@ function render(){
 
   // 1. Header & Identity
   const av = document.getElementById('av');
-  if(av) { av.textContent = em.icon; av.style.borderColor = em.c+'88'; av.style.opacity = BODY.isAsleep ? '0.3' : '1'; }
+  if(av) { 
+    av.textContent = em.icon; 
+    av.style.borderColor = em.c+'88'; 
+    av.style.opacity = BODY.isAsleep ? '0.3' : '1'; 
+  }
   const status = document.getElementById('status');
   if(status) status.textContent = `${FUNC[dk]} — ${dev.desc} (${eventCount} events)` + (NARRATIVE_SELF.strength > 0.2 ? ' · "'+p(NARRATIVE_SELF.phrases)+'"' : '');
 
@@ -37,30 +41,36 @@ function render(){
     });
   }
 
-  // 4. Memory & Abstracted Beliefs
+  // 4. Color-Coded Memory & Abstracted Beliefs
   const mlist = document.getElementById('mem-list');
   if(mlist) {
     mlist.innerHTML = '';
-    // Episodic
+    // Individual Episodes (Fainted & Color-coded by emotion)
     episodicMemory.forEach(ep => {
-      const el = document.createElement('div'); el.className = 'mem-item';
-      el.innerHTML = `<div class="mem-dot" style="background:${EM[ep.emo]?.c || '#666'}"></div> <span>${ep.label}</span>`;
+      const el = document.createElement('div'); 
+      el.className = 'mem-item';
+      const emoColor = EM[ep.emo]?.c || '#666';
+      el.style.color = emoColor; 
+      el.innerHTML = `<div class="mem-dot" style="background:${emoColor}"></div> <span>${ep.label}</span>`;
       mlist.appendChild(el);
     });
-    // Abstracted Beliefs
+    // Abstracted Beliefs (Stars)
     const beliefs = Object.values(semanticBeliefs);
     if(beliefs.length > 0) {
-      mlist.innerHTML += `<div style="margin-top:10px; font-size:8px; color:var(--t3); text-transform:uppercase;">Abstracted Beliefs</div>`;
+      mlist.innerHTML += `<div style="margin: 12px 0 6px; font-size: 8px; color: var(--t3); font-family: var(--m); letter-spacing: 1px;">ABSTRACTED BELIEFS</div>`;
       beliefs.forEach(b => {
-        const el = document.createElement('div'); el.className = 'mem-item'; el.style.fontStyle = 'italic';
-        el.innerHTML = `<div class="mem-dot" style="background:${b.color}"></div> <span>${b.label} (${friendly(b.strength)})</span>`;
+        const el = document.createElement('div'); 
+        el.className = 'mem-item';
+        el.style.color = b.color;
+        el.style.fontStyle = 'italic';
+        el.innerHTML = `<div class="mem-dot" style="background:${b.color}"></div> <span>★ ${b.label} (${friendly(b.strength)})</span>`;
         mlist.appendChild(el);
       });
     }
   }
   setEl('mem-count', `${episodicMemory.length} eps, ${Object.keys(semanticBeliefs).length} beliefs`);
 
-  // 5. Psychological Needs
+  // 5. Psychological Needs (Friendly Text)
   const ngrid = document.getElementById('need-row');
   if(ngrid) {
     ngrid.innerHTML = '';
@@ -71,7 +81,7 @@ function render(){
     });
   }
 
-  // 6. Caregiver & Attachment
+  // 6. Caregiver & Attachment (Friendly Text)
   const cgrid = document.getElementById('cg-grid');
   if(cgrid) {
     cgrid.innerHTML = `<div class="tbar"><div class="tbar-label">Stress: ${friendly(CAREGIVER.stress)}</div><div class="tbar-track"><div class="tbar-fill" style="width:${CAREGIVER.stress*100}%;background:#a84040"></div></div></div>` +
@@ -81,7 +91,7 @@ function render(){
   const att = getAttachmentStyle();
   if(iwm) iwm.innerHTML = `<span style="color:${att.color}">${att.name}</span>: ${att.desc}`;
 
-  // 7. Temperament
+  // 7. Temperament (Friendly Text)
   const tgrid = document.getElementById('temp-grid');
   if(tgrid) {
     tgrid.innerHTML = '';
@@ -94,14 +104,18 @@ function render(){
     });
   }
 
-  // 8. Core Beliefs (Schemas)
+  // 8. Formatted Core Beliefs (Schemas)
   const sgrid = document.getElementById('schema-grid');
   if(sgrid) {
     sgrid.innerHTML = '';
     Object.values(SCHEMAS).forEach(s => {
-        if(s.strength < 0.1) return;
-        const el = document.createElement('div'); el.className='si';
-        el.innerHTML = `<div class="sl">${s.label}</div><div class="st"><div class="sf" style="width:${s.strength*100}%;background:${s.color}"></div></div>`;
+        if(s.strength < 0.05) return;
+        const el = document.createElement('div'); 
+        el.className = 'si ' + (s.valence > 0 ? 'pos' : 'neg');
+        el.innerHTML = `
+          <div class="sl">${s.label}</div>
+          <div class="st"><div class="sf" style="width:${s.strength*100}%;background:${s.color}"></div></div>
+        `;
         sgrid.appendChild(el);
     });
   }
@@ -122,6 +136,9 @@ function render(){
   // 10. ToM & Defense
   setEl('defn', def ? def.def : 'none');
   const dStyle = document.getElementById('def-style');
-  if(dStyle) dStyle.textContent = "Style forming...";
+  if(dStyle) {
+    const topDef = Object.entries(DEFENSE_USAGE).sort((a,b)=>b[1]-a[1])[0];
+    dStyle.textContent = topDef && topDef[1] > 0 ? `Style: ${topDef[0]}` : "Style forming...";
+  }
   setEl('tom-display', tomState ? tomState.label : 'no other-modeling yet');
 }
