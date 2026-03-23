@@ -24,10 +24,11 @@ function init() {
 // MAIN LOOP — fires every 4.5s
 // ═══════════════════════════════════════════════════════
 setInterval(()=>{
-  // --- ADD THIS LINE AT THE TOP ---
   updateBody(); 
+  updateChemistry(); // ADD THIS LINE HERE
 
   const decayRate = 0.88 + TEMP.effortControl * 0.08;
+  // ... rest of your code
   const baseline = 5;
 
   // --- ADD THIS LOGIC ---

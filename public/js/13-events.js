@@ -258,14 +258,17 @@ function fastForward(){
     {w:['mother','mom','parent','family'],               events:{'given trust':3,kindness:3,morning:2}},
     {w:['friend','friendship','social'],                 events:{kindness:3,'given trust':2,achievement:2}},
     {w:['school','learn','education','study'],           events:{achievement:4,judged:3,failure:2}},
-    {w:['abuse','trauma','violence','hurt'],             events:{threat:5,humiliation:4,betrayal:3,alone:4}},
-    {w:['neglect','alone','lonely','absent'],            events:{alone:5,failure:3}},
+// Increase the counts for negative events so they take priority
+    {w:['abuse','trauma','violence','hurt'],             events:{threat:12,humiliation:8,betrayal:6,alone:10}},
+    {w:['neglect','alone','lonely','absent'],            events:{alone:15,failure:5}},
+    {w:['loss','grief','death','died','die'],            events:{alone:20,sadness:15,fear:10,failure:5}},
     {w:['success','achieve','accomplish','good at'],     events:{achievement:5,kindness:2}},
     {w:['fail','struggle','difficult','hard'],           events:{failure:4,judged:3}},
     {w:['betray','trust broken','lied','cheat'],         events:{betrayal:4,alone:3}},
     {w:['conflict','fight','argument'],                  events:{anger:3,judged:3,failure:2}},
     {w:['move','moved','new place','relocated'],         events:{alone:2,surprise:2,morning:2}},
     {w:['loss','grief','death','died'],                  events:{alone:4,failure:2,sadness:3}},
+    
   ];
   matchers.forEach(m=>{if(m.w.some(w=>text.includes(w))){Object.entries(m.events).forEach(([e,n])=>weights[e]=(weights[e]||0)+n);}});
   if(Object.keys(weights).length===0)weights.morning=5;

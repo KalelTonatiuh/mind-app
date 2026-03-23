@@ -44,9 +44,10 @@ let eventCount = 0;
 
 function getPlasticity() {
   const base = 0.018 + 0.10 * Math.exp(-eventCount/180);
-  return Math.min(0.15, base * (0.8 + TEMP.orientSens * 0.4));
+  // Dopamine (reward) now scales how much we learn from an event
+  const dopaMod = 0.5 + CHEM.dopamine; 
+  return Math.min(0.2, base * (0.8 + TEMP.orientSens * 0.4) * dopaMod);
 }
-
 function hebbianUpdate() {
   const plasticity = getPlasticity();
   const active = Object.values(nodes).filter(n=>n.activation>0.12);
