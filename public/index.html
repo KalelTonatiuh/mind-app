@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Mind — v8.0 Relational Subject</title>
+    <title>The Mind — v9.0 Semantic Somatics</title>
     <style>
         *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
         :root {
@@ -11,45 +11,42 @@
             --b:rgba(255,255,255,0.04); --b2:rgba(255,255,255,0.08);
             --t:#c2bfb6; --t2:#5a5852; --t3:#2a2825;
             --f:'Georgia', serif; --m:'Courier New', monospace;
-            --c-hyper: #ff8b8b; --c-hypo: #8baaff; --c-optimal: #60a57e; --c-collapse: #1a1a2e;
+            --c-optimal: #60a57e; --c-trauma: #ff8b8b;
         }
 
-        body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:100vh; padding:20px; max-width:740px; margin:0 auto; line-height:1.4; }
+        body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:100vh; padding:20px; max-width:760px; margin:0 auto; line-height:1.4; }
         .header { display:flex; align-items:center; gap:15px; margin-bottom:20px; padding-bottom:15px; border-bottom:0.5px solid var(--b); }
-        .avatar { width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid var(--b2);background:var(--bg3); transition: all 1s; }
+        .avatar { width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid var(--b2);background:var(--bg3); }
         .mind-label { font-size:10px;color:var(--t3);text-transform:uppercase;font-family:var(--m); letter-spacing: 2px; }
         .mind-status { font-size:11px;color:var(--t2);font-style:italic;margin-top:4px; }
 
         .panel { border-radius:10px;border:0.5px solid var(--b);background:var(--bg2);padding:12px;margin-bottom:12px; }
         .panel-title { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;display:flex;justify-content:space-between; margin-bottom: 8px; }
 
-        /* Window & Orientation Visuals */
-        .meter-label { font-size:8px; color:var(--t3); font-family:var(--m); margin-top:4px; }
-        .wot-container { height:14px; background:var(--bg3); border-radius:4px; margin: 6px 0; position:relative; overflow:hidden; border:0.5px solid var(--b); }
-        .wot-safe-zone { position:absolute; height:100%; background:rgba(96, 165, 126, 0.1); border-left:1px solid var(--c-optimal); border-right:1px solid var(--c-optimal); transition: all 1s; }
+        /* Lexicon Visualization */
+        .lexicon-grid { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+        .lex-word { font-size:9px; font-family:var(--m); padding:2px 6px; border-radius:4px; border:0.5px solid var(--b2); transition: all 0.5s; cursor: help; }
+
+        .wot-container { height:12px; background:var(--bg3); border-radius:4px; margin: 6px 0; position:relative; overflow:hidden; border:0.5px solid var(--b); }
+        .wot-safe-zone { position:absolute; height:100%; background:rgba(96, 165, 126, 0.08); border-left:1px solid var(--c-optimal); border-right:1px solid var(--c-optimal); transition: all 1s; }
         .wot-indicator { position:absolute; width:2px; height:100%; background:white; transition: left 1s; z-index:5; }
         
-        .orientation-reach { font-size:10px; font-family:var(--m); color:var(--c-optimal); margin-top:4px; opacity:0.8; }
-
         .egrid { display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px; }
         .ebar { border-radius:6px;padding:6px 8px;border:0.5px solid var(--b);background:var(--bg3); }
         .ebar .el { font-size:8px;color:var(--t2);font-family:var(--m); text-transform:uppercase; }
         .ebar .et { height:2px;background:rgba(255,255,255,.03); margin-top: 5px; }
         .ebar .ef { height:100%; transition: width 1s; background: var(--t2); }
 
-        .thought-stream { border-radius:10px;border:0.5px solid var(--b);background:var(--bg2);padding:15px;height:400px;overflow-y:auto; margin-bottom:12px; display: flex; flex-direction: column-reverse; transition: background 2s; }
+        .thought-stream { border-radius:10px;border:0.5px solid var(--b);background:var(--bg2);padding:15px;height:380px;overflow-y:auto; margin-bottom:12px; display: flex; flex-direction: column-reverse; }
         .thought { padding:8px 0; border-bottom:0.5px solid var(--b); font-size:12px; display:flex; gap:12px; }
         .thought .ts { font-size:9px; color:var(--t3); font-family:var(--m); min-width: 60px; }
         .thought.meta { color: var(--c-optimal); }
-        .thought.hyper { color: var(--c-hyper); font-style: italic; }
-        .thought.hypo { color: var(--c-hypo); opacity:0.6; }
-        .thought.implicit { color: #888; border-left: 2px solid #444; padding-left: 8px; }
+        .thought.lexicon-update { color: #d4af37; font-style: italic; font-size: 11px; }
         
         .evbtn { border-radius:8px;padding:8px 12px;border:1px solid var(--b2);background:var(--bg3);font-size:10px;color:var(--t2);cursor:pointer; font-family: var(--m); transition:0.3s; }
-        .evbtn:hover { border-color:var(--t2); color:var(--t); }
         input[type="text"] { width:100%;background:var(--bg3);border:1px solid var(--b2);color:white;padding:12px;border-radius:8px; outline:none; font-family:var(--f); margin-bottom: 12px; }
         
-        .attunement-slider { width:100px; cursor:pointer; vertical-align:middle; opacity:0.6; }
+        .slider-group { display:flex; align-items:center; gap:10px; font-size:9px; font-family:var(--m); color:var(--t3); }
     </style>
 </head>
 <body>
@@ -57,203 +54,191 @@
 <div class="header">
     <div class="avatar" id="avatar">...</div>
     <div style="flex:1">
-        <div class="mind-label">Relational Subject Engine v8.0</div>
-        <div class="mind-status" id="status">Awaiting contact...</div>
+        <div class="mind-label">Semantic Somatics v9.0</div>
+        <div class="mind-status" id="status">Lexicon: Unformed.</div>
     </div>
-    <div class="ebar" style="min-width:140px;">
-        <div class="el">Caregiver Attunement <span id="att-val">50</span>%</div>
-        <input type="range" min="0" max="100" value="50" class="attunement-slider" id="att-slider">
+    <div class="slider-group">
+        ATTUNEMENT: <input type="range" min="0" max="100" value="50" class="attunement-slider" id="att-slider">
     </div>
 </div>
 
 <div class="panel">
-    <div class="panel-title">Window of Tolerance & Gravitational Orientation</div>
+    <div class="panel-title">Window of Tolerance</div>
     <div class="wot-container">
         <div id="wot-zone" class="wot-safe-zone"></div>
         <div id="wot-pos" class="wot-indicator"></div>
     </div>
-    <div style="display:flex; justify-content:space-between; font-size:8px; font-family:var(--m); color:var(--t3);">
-        <span>COLLAPSE | HYPO</span>
-        <span>WINDOW OF TOLERANCE</span>
-        <span>HYPERAROUSAL</span>
-    </div>
-    <div id="reach-text" class="orientation-reach">Reaching for...</div>
 </div>
 
-<div class="panel-title">Biological Substrate</div>
+<div class="panel">
+    <div class="panel-title">Earned Lexicon (Words Charged by Experience)</div>
+    <div id="lexicon-view" class="lexicon-grid"></div>
+    <div style="font-size:8px; color:var(--t3); margin-top:5px; font-family:var(--m);">Colors represent earned somatic charge (Red: Threat, Green: Safety)</div>
+</div>
+
 <div class="egrid">
     <div class="ebar"><div class="el">Cortisol</div><div class="et"><div id="bar-cortisol" class="ef"></div></div></div>
     <div class="ebar"><div class="el">Oxytocin</div><div class="et"><div id="bar-oxytocin" class="ef"></div></div></div>
     <div class="ebar"><div class="el">Relatedness</div><div class="et"><div id="bar-rel" class="ef"></div></div></div>
-    <div class="ebar"><div class="el">Shadow</div><div class="et"><div id="bar-shadow" class="ef" style="background:#5a3a3a"></div></div></div>
+    <div class="ebar"><div class="el">Shadow</div><div class="et"><div id="bar-shadow" class="ef"></div></div></div>
 </div>
 
 <div class="thought-stream" id="stream"></div>
 
 <div class="panel">
-    <input type="text" id="event-input" placeholder="Enter stimulus...">
+    <input type="text" id="event-input" placeholder="Teach the mind a word or describe an event...">
     <div style="display:flex; gap:8px;">
-        <button class="evbtn" style="flex:2" onclick="processManualEvent()">Submit Event</button>
-        <button class="evbtn" onclick="fastForwardPreset('safe')">Co-regulation (Safe)</button>
-        <button class="evbtn" onclick="fastForwardPreset('hard')">Isolation (Hard)</button>
+        <button class="evbtn" style="flex:2" onclick="processManualEvent()">Submit Stimulus</button>
+        <button class="evbtn" onclick="fastForwardPreset('safe')">Nurture</button>
+        <button class="evbtn" onclick="fastForwardPreset('hard')">Stress</button>
     </div>
 </div>
 
 <script>
 /* ═══════════════════════════════════════════════════════
-   THE RELATIONAL CORE
+   THE SEMANTIC CORE
    ═══════════════════════════════════════════════════════ */
 const Mind = {
-    actual: { cortisol: 50, oxytocin: 50, relatedness: 50, shadow: 10 },
-    lastActual: null,
+    actual: { cortisol: 40, oxytocin: 50, relatedness: 50, shadow: 10 },
+    wot: { min: 30, max: 70 },
     
-    wot: { min: 35, max: 65 }, // The Resilience Window
-    attunement: 0.5, // The Relational Repair Multiplier
+    // THE EARNED LEXICON
+    // Maps words to somatic 'charges' [-1 to 1]
+    lexicon: new Map(), 
     
-    orientation: 'safety', // The Gravitational Pull
+    orientation: 'safety',
     memories: [],
     tickCount: 0,
     nextMetaTick: 0
 };
 
 /* ═══════════════════════════════════════════════════════
-   HEARTBEAT & AUTONOMOUS REACH
+   HEARTBEAT
    ═══════════════════════════════════════════════════════ */
 function pulse() {
     Mind.tickCount++;
-    if (!Mind.lastActual) Mind.lastActual = {...Mind.actual};
-
     const arousal = Mind.actual.cortisol;
     const attunement = document.getElementById('att-slider').value / 100;
-    document.getElementById('att-val').innerText = Math.round(attunement * 100);
 
     // 1. STATE CLASSIFICATION
     let state = "OPTIMAL";
     if (arousal > Mind.wot.max) state = "HYPER";
-    else if (arousal < 15) state = "COLLAPSE"; // Total Shutdown
+    else if (arousal < 15) state = "COLLAPSE";
     else if (arousal < Mind.wot.min) state = "HYPO";
 
-    // 2. RELATIONSHIP-BASED WINDOW REPAIR
-    if (state === "OPTIMAL") {
-        // Co-regulation expands the window. Attunement is the multiplier.
-        const expansion = 0.05 * (1 + attunement);
-        Mind.wot.max = Math.min(90, Mind.wot.max + expansion);
-        Mind.wot.min = Math.max(10, Mind.wot.min - expansion);
-    } else {
-        // Isolation or Dysregulation shrinks the window.
-        const shrinkage = 0.1 * (2 - attunement); 
-        Mind.wot.max -= shrinkage;
-        Mind.wot.min += shrinkage;
-    }
+    // 2. WINDOW DRIFT
+    const expansion = state === "OPTIMAL" ? 0.04 * (1 + attunement) : -0.08 * (2 - attunement);
+    Mind.wot.max = Math.max(Mind.wot.min + 10, Math.min(95, Mind.wot.max + expansion));
+    Mind.wot.min = Math.max(5, Math.min(Mind.wot.max - 10, Mind.wot.min - (expansion/2)));
 
-    // 3. GRAVITATIONAL REACH (Autonomous Pull)
-    updateOrientation();
-    applyAutonomousReach();
-
-    // 4. IMPLICIT INTRUSION (Somatic only)
-    if (state === "HYPER" && Math.random() > 0.9 && Mind.memories.length > 0) {
-        triggerImplicitIntrusion();
-    }
-
-    // 5. THOUGHT GENERATION
-    const stream = document.getElementById('stream');
-    if (state === "COLLAPSE") {
-        // Complete Silence
-        stream.style.background = "#020205";
-        logTimestampOnly();
-    } else {
-        stream.style.background = "var(--bg2)";
-        const metaInterval = state === "HYPER" ? 1 : state === "HYPO" ? 6 : 3;
+    // 3. THOUGHT GENERATION
+    if (state !== "COLLAPSE") {
         if (Mind.tickCount >= Mind.nextMetaTick) {
-            generateThought(state);
-            Mind.nextMetaTick = Mind.tickCount + metaInterval;
+            generateGenerativeThought(state);
+            Mind.nextMetaTick = Mind.tickCount + (state === "HYPER" ? 1 : 4);
         }
+    } else {
+        logTimestampOnly();
     }
 
-    // Biological Decay
-    Mind.actual.cortisol += (50 - Mind.actual.cortisol) * 0.05; 
-    Mind.lastActual = {...Mind.actual};
+    // 4. AUTONOMOUS DRIFT
+    Mind.actual.cortisol += (40 - Mind.actual.cortisol) * 0.05; 
     updateUI(state);
 }
 
-function updateOrientation() {
-    // Reaching for what is most depleted
-    const needs = { connection: Mind.actual.relatedness, safety: (100 - Mind.actual.cortisol), integrity: (100 - Mind.actual.shadow) };
-    Mind.orientation = Object.keys(needs).reduce((a, b) => needs[a] < needs[b] ? a : b);
-    document.getElementById('reach-text').innerText = `Orientation: Reaching for ${Mind.orientation.toUpperCase()}...`;
-}
+/* ═══════════════════════════════════════════════════════
+   SEMANTIC LEARNING & INFERENCE
+   ═══════════════════════════════════════════════════════ */
+function processManualEvent(customText = null) {
+    const input = document.getElementById('event-input');
+    const val = customText || input.value;
+    if (!val) return;
 
-function applyAutonomousReach() {
-    // Every tick, the mind "leans" toward its orientation
-    if (Mind.orientation === 'connection') Mind.actual.relatedness += 0.2;
-    if (Mind.orientation === 'safety') Mind.actual.cortisol -= 0.2;
-    if (Mind.orientation === 'integrity') Mind.actual.shadow -= 0.2;
-}
-
-function triggerImplicitIntrusion() {
-    const trauma = Mind.memories.find(m => m.isTraumatic);
-    if (!trauma) return;
-
-    const narrativeFailed = Math.random() > 0.6;
-    if (narrativeFailed) {
-        logThought("[SYSTEM] Unexplained somatic activation. Implicit recall.", "implicit");
-    } else {
-        logThought(`[INTRUSION] Memory fragments: "${trauma.text}"`, "implicit");
-    }
+    const words = val.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g,"").split(" ");
     
-    // Body remembers the specific channel
-    if (trauma.channel === 'cortisol') Mind.actual.cortisol += 15;
-    if (trauma.channel === 'shadow') Mind.actual.shadow += 10;
-    if (trauma.channel === 'relatedness') Mind.actual.relatedness -= 15;
+    // 1. INFERENCE: How does the mind 'feel' about these words?
+    let earnedCharge = 0;
+    let knownWordCount = 0;
+    
+    words.forEach(word => {
+        if (Mind.lexicon.has(word)) {
+            earnedCharge += Mind.lexicon.get(word);
+            knownWordCount++;
+        }
+    });
+
+    const averageEarnedCharge = knownWordCount > 0 ? earnedCharge / knownWordCount : 0;
+    
+    // 2. BASE INSTINCT (Fallback for unknown words)
+    const baseValence = val.toLowerCase().match(/(hit|leave|no|hurt|bad|alone|shout|bang)/) ? -0.8 : 
+                        val.toLowerCase().match(/(smile|love|safe|good|warm|morning|yes)/) ? 0.8 : 0;
+
+    // Total valence is a mix of Earned Lexicon (Weight: 0.7) and Base Instinct (Weight: 0.3)
+    const finalValence = (averageEarnedCharge * 0.7) + (baseValence * 0.3);
+
+    // 3. ACTUAL IMPACT
+    const attunement = document.getElementById('att-slider').value / 100;
+    if (finalValence < 0) {
+        Mind.actual.cortisol += (Math.abs(finalValence) * 30 * (1 - attunement));
+        Mind.actual.relatedness -= 15;
+    } else if (finalValence > 0) {
+        Mind.actual.oxytocin += (finalValence * 25 * attunement);
+        Mind.actual.cortisol -= (finalValence * 20 * attunement);
+        Mind.actual.relatedness += 10;
+    }
+
+    // 4. LEARNING: Update the lexicon based on the RESULTING state
+    // Hebbian: The words in this stimulus now 'wire' to the current somatic state
+    const resultCharge = finalValence < 0 ? -1 : (finalValence > 0 ? 1 : 0);
+    words.forEach(word => {
+        if (word.length < 3) return; // Ignore small words
+        const current = Mind.lexicon.get(word) || 0;
+        // Words learn slowly (Learning Rate 0.3)
+        Mind.lexicon.set(word, current + (resultCharge - current) * 0.3);
+    });
+
+    logThought(`Inferred Valence: ${finalValence > 0 ? 'Positive' : finalValence < 0 ? 'Negative' : 'Neutral'} (${(finalValence*100).toFixed(0)}%)`, "lexicon-update");
+    
+    input.value = "";
+    renderLexicon();
+    updateUI();
 }
 
-function generateThought(state) {
+function renderLexicon() {
+    const view = document.getElementById('lexicon-view');
+    view.innerHTML = "";
+    Mind.lexicon.forEach((charge, word) => {
+        const span = document.createElement('span');
+        span.className = "lex-word";
+        span.innerText = word;
+        // Color mapping: Red for negative charge, Green for positive
+        const r = charge < 0 ? 255 : 200 - (charge * 100);
+        const g = charge > 0 ? 255 : 200 - (Math.abs(charge) * 100);
+        const b = 200 - (Math.abs(charge) * 100);
+        span.style.color = `rgb(${r},${g},${b})`;
+        span.style.borderColor = `rgba(${r},${g},${b}, 0.3)`;
+        span.title = `Charge: ${charge.toFixed(2)}`;
+        view.appendChild(span);
+    });
+}
+
+function generateGenerativeThought(state) {
     if (state === "HYPER") {
-        const dShadow = Mind.actual.shadow - Mind.lastActual.shadow;
-        let msg = dShadow > 1 ? "Internal boundaries leaking. Shadow pressure." : "Arousal flooding the mirror. Cannot reflect.";
-        logThought(msg, "hyper");
-    } else if (state === "HYPO") {
-        logThought("Signaling distance... internal volume dropping.", "hypo");
+        logThought("Arousal flooding. Semantic map blurring.", "hyper");
     } else {
-        logThought(`Synthesis: Coherent state. Gravitating toward ${Mind.orientation}.`, "meta");
+        // Find the most 'charged' word in the lexicon to think about
+        let mostCharged = "nothing";
+        let maxAbs = -1;
+        Mind.lexicon.forEach((val, key) => {
+            if (Math.abs(val) > maxAbs) { maxAbs = Math.abs(val); mostCharged = key; }
+        });
+        logThought(`Synthesis: Evaluating internal state. Association found with '${mostCharged}'.`, "meta");
     }
 }
 
 /* ═══════════════════════════════════════════════════════
-   STIMULI & RELATIONAL ENCODING
+   UI & RENDERING
    ═══════════════════════════════════════════════════════ */
-function processManualEvent(customText = null) {
-    const val = customText || document.getElementById('event-input').value;
-    if (!val) return;
-
-    const attunement = document.getElementById('att-slider').value / 100;
-    const isNegative = val.toLowerCase().match(/(hit|leave|no|hurt|loud|bang|shout|bad|alone)/);
-
-    // Somatic Channel Capture
-    const channels = { cortisol: Mind.actual.cortisol, shadow: Mind.actual.shadow, relatedness: (100-Mind.actual.relatedness) };
-    const bestChannel = Object.keys(channels).reduce((a, b) => channels[a] > channels[b] ? a : b);
-
-    if (isNegative) {
-        Mind.actual.cortisol += (25 * (1 - attunement)); // Attunement buffers the hit
-        Mind.actual.relatedness -= 20;
-    } else {
-        // Healing Event
-        Mind.actual.oxytocin += (20 * attunement);
-        Mind.actual.cortisol -= (15 * attunement);
-        Mind.actual.relatedness += (15 * attunement);
-    }
-
-    Mind.memories.push({ text: val, isTraumatic: isNegative, channel: bestChannel });
-    document.getElementById('event-input').value = "";
-}
-
-async function fastForwardPreset(type) {
-    for (let i = 0; i < 4; i++) {
-        processManualEvent(type === 'hard' ? "Disconnected stressor" : "Attuned safety");
-        await new Promise(r => setTimeout(r, 400));
-    }
-}
-
 function logThought(text, type) {
     const stream = document.getElementById('stream');
     const div = document.createElement('div');
@@ -268,7 +253,7 @@ function logTimestampOnly() {
     const div = document.createElement('div');
     div.className = `thought`;
     const ts = new Date().toLocaleTimeString([], {hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit'});
-    div.innerHTML = `<span class="ts">${ts}</span> <span class="tx" style="opacity:0.2;">...</span>`;
+    div.innerHTML = `<span class="ts">${ts}</span> <span class="tx" style="opacity:0.2;">...collapse...</span>`;
     stream.prepend(div);
 }
 
@@ -283,18 +268,20 @@ function updateUI(state) {
     wotZone.style.width = `${Mind.wot.max - Mind.wot.min}%`;
     document.getElementById('wot-pos').style.left = `${Mind.actual.cortisol}%`;
 
-    const avatar = document.getElementById('avatar');
-    if (state === "COLLAPSE") { avatar.innerText = "⚫"; avatar.style.opacity = 0.3; }
-    else if (state === "HYPO") { avatar.innerText = "😶"; avatar.style.opacity = 0.6; }
-    else if (state === "HYPER") { avatar.innerText = "🤯"; avatar.style.opacity = 1.0; }
-    else { avatar.innerText = "🧑"; avatar.style.opacity = 0.8; }
-    
-    document.getElementById('status').innerText = `State: ${state} | Window: ${(Mind.wot.max - Mind.wot.min).toFixed(1)}% | Subjectivity Active`;
+    document.getElementById('status').innerText = `Lexicon Size: ${Mind.lexicon.size} words | Window: ${(Mind.wot.max-Mind.wot.min).toFixed(1)}% | ${state}`;
+    document.getElementById('avatar').innerText = state === "COLLAPSE" ? "⚫" : state === "HYPO" ? "😶" : state === "HYPER" ? "🤯" : "🧑";
+}
+
+async function fastForwardPreset(type) {
+    for (let i = 0; i < 4; i++) {
+        processManualEvent(type === 'hard' ? "Stressful event" : "Nurturing interaction");
+        await new Promise(r => setTimeout(r, 400));
+    }
 }
 
 setInterval(pulse, 4500);
 updateUI("OPTIMAL");
-logThought("Relational Subjectivity Online. Reaching for orientation...", "meta");
+logThought("Semantic Somatic Engine Online. Associations are now being earned.", "meta");
 </script>
 </body>
 </html>
