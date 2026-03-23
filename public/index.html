@@ -1,295 +1,149 @@
-
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Mind</title>
 <style>
-*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
 :root {
---bg:#0c0c0d; --bg2:#131315; --bg3:#191920;
---b:rgba(255,255,255,0.055); --b2:rgba(255,255,255,0.1);
---t:#dad7cf; --t2:#68665f; --t3:#3a3835;
---f:'Georgia',serif; --m:'Courier New',monospace;
+  --bg:#0a0a0b; --panel:#121215; --border:rgba(255,255,255,0.06);
+  --accent:#5b8fb9; --text:#e5e5e7; --dim:#71717a; --v-dim:#3f3f46;
+  --font:'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
-body { background:var(--bg); color:var(--t); font-family:var(--f); min-height:100vh; padding:18px 16px 60px; max-width:660px; margin:0 auto; }
+body { background:var(--bg); color:var(--text); font-family:var(--font); line-height:1.6; padding:40px 20px; max-width:700px; margin:0 auto; }
 
+/* Header & Avatar */
+.header { text-align:center; margin-bottom:40px; }
+.avatar { width:64px; height:64px; font-size:32px; margin:0 auto 15px; border-radius:50%; background:var(--panel); display:flex; align-items:center; justify-content:center; border:1px solid var(--border); transition: 1s; }
+.mind-status { font-size:20px; font-weight:300; letter-spacing:-0.02em; }
+.mind-sub { font-size:12px; color:var(--dim); margin-top:4px; font-style:italic; }
 
-.header { display:flex; align-items:center; gap:12px; margin-bottom:14px; padding-bottom:12px; border-bottom:0.5px solid var(--b); }
-.avatar { width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid var(--b2);background:var(--bg3);transition:background 1.2s,border-color 1.2s;flex-shrink:0; }
-.mind-label { font-size:10px;color:var(--t3);letter-spacing:.12em;text-transform:uppercase;font-family:var(--m); }
-.mind-status { font-size:12px;color:var(--t2);font-style:italic;margin-top:3px; }
-.hbtn { font-size:10px;font-family:var(--m);border-radius:4px;padding:4px 8px;border:0.5px solid var(--b2);background:transparent;color:var(--t3);cursor:pointer; }
-.hbtn:hover { color:var(--t2); }
+/* The Heart: Thought Stream */
+.stream-label { font-size:10px; text-transform:uppercase; color:var(--v-dim); letter-spacing:0.1em; margin-bottom:12px; font-weight:700; }
+.thought-stream { background:var(--panel); border:1px solid var(--border); border-radius:16px; padding:24px; min-height:250px; margin-bottom:40px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.thought { padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.03); font-size:16px; display:flex; gap:15px; }
+.thought .ts { color:var(--v-dim); font-size:10px; padding-top:5px; flex-shrink:0; }
+.thought.nv .tx { color:var(--dim); font-style:italic; }
 
-.panel { border-radius:8px;border:0.5px solid var(--b);background:var(--bg2);padding:9px 11px;margin-bottom:9px; }
-.panel-title { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center; }
-.ptog { cursor:pointer;color:var(--t3); }
-.ptog:hover { color:var(--t2); }
+/* The World: Stimulus Buttons */
+.section-label { font-size:11px; color:var(--dim); margin-bottom:15px; text-align:center; }
+.evgrid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:20px; }
+.evbtn { background:var(--panel); border:1px solid var(--border); color:var(--text); padding:12px; border-radius:10px; cursor:pointer; font-size:12px; transition:0.2s; }
+.evbtn:hover { border-color:var(--accent); background:rgba(255,255,255,0.03); }
+.custom-row { display:flex; gap:10px; margin-bottom:50px; }
+.custom-row input { flex:1; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px; color:white; outline:none; }
+.custom-row button { background:var(--accent); border:none; color:white; padding:0 20px; border-radius:10px; cursor:pointer; font-weight:600; }
 
-/* Semantic network display */
-.sem-grid { display:flex;flex-wrap:wrap;gap:3px; }
-.sem-node { font-size:8px;font-family:var(--m);border-radius:3px;padding:1px 4px;border:0.5px solid var(--b);transition:background .3s,border-color .3s; }
+/* Vitals: Collapsed by default */
+.vitals-area { margin-top:60px; border-top:1px solid var(--border); padding-top:30px; }
+.panel { margin-bottom:10px; border-radius:8px; background:rgba(255,255,255,0.02); }
+.panel-title { padding:15px; font-size:12px; color:var(--dim); cursor:pointer; display:flex; justify-content:space-between; }
+.panel-body { padding:0 15px 15px; display:none; } /* Hidden by default */
 
-/* Needs */
-.need-row { display:flex;gap:6px;margin-bottom:7px; }
-.need-item { flex:1; }
-.need-label { font-size:9px;color:var(--t3);font-family:var(--m);margin-bottom:2px; }
-.need-track { height:3px;border-radius:2px;background:rgba(255,255,255,.04);overflow:hidden; }
-.need-fill { height:100%;border-radius:2px;transition:width .9s; }
-.need-val { font-size:9px;color:var(--t3);font-family:var(--m);text-align:right;margin-top:1px; }
+.grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:15px; }
+.stat-card { padding:10px; border-radius:6px; background:rgba(255,255,255,0.03); }
+.stat-label { font-size:10px; color:var(--v-dim); text-transform:uppercase; margin-bottom:4px; }
+.stat-val { font-size:14px; }
 
-/* Schema */
-.schema-grid { display:grid;grid-template-columns:1fr 1fr;gap:4px; }
-.si { display:flex;align-items:center;gap:5px; }
-.si .sl { font-size:9px;color:var(--t3);font-family:var(--m);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-.si .st { height:2px;flex:1;border-radius:1px;background:rgba(255,255,255,.04);overflow:hidden; }
-.si .sf { height:100%;border-radius:1px;transition:width .9s; }
-.si .sv { font-size:9px;color:var(--t3);font-family:var(--m);min-width:18px;text-align:right; }
-
-/* Memory */
-.mem-list { max-height:72px;overflow-y:auto; }
-.mem-list::-webkit-scrollbar { width:2px; }
-.mem-list::-webkit-scrollbar-thumb { background:var(--b2);border-radius:2px; }
-.mem-item { font-size:10px;color:var(--t3);font-family:var(--m);padding:2px 0;border-bottom:0.5px solid var(--b);display:flex;gap:5px;align-items:baseline; }
-.mem-item:last-child { border-bottom:none; }
-.mem-dot { width:5px;height:5px;border-radius:50%;flex-shrink:0; }
-
-/* State */
-.state-row { display:flex;gap:5px;margin-bottom:9px; }
-.scard { flex:1;min-width:0;border-radius:7px;padding:7px 9px;border:0.5px solid var(--b);background:var(--bg2); }
-.sc-l { font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;font-family:var(--m); }
-.sc-v { font-size:11px;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-.sc-s { font-size:9px;color:var(--t3);margin-top:1px;font-family:var(--m);overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
-
-.egrid { display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:9px; }
-.ebar { border-radius:5px;padding:5px 6px;border:0.5px solid var(--b);background:var(--bg2); }
-.ebar .el { font-size:9px;color:var(--t3);font-family:var(--m); }
-.ebar .ei { font-size:8px;color:var(--t3);font-style:italic;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-.ebar .et { height:2px;border-radius:1px;background:rgba(255,255,255,.04);overflow:hidden;margin-bottom:2px; }
-.ebar .ef { height:100%;border-radius:1px;transition:width .8s cubic-bezier(.4,0,.2,1); }
-.ebar .ev { font-size:9px;color:var(--t3);text-align:right;font-family:var(--m); }
-
-.def-row { border-radius:7px;padding:7px 10px;border:0.5px solid var(--b);background:var(--bg2);margin-bottom:9px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;min-height:30px; }
-.def-l { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;letter-spacing:.08em;flex-shrink:0; }
-.def-n { font-size:11px;color:var(--t);transition:color .4s; }
-.def-d { font-size:10px;color:var(--t3);font-style:italic; }
-
-.tom-row { border-radius:7px;padding:7px 10px;border:0.5px solid var(--b);background:var(--bg2);margin-bottom:9px;font-size:10px;color:var(--t3);font-family:var(--m);min-height:28px;display:flex;align-items:center;gap:8px; }
-.tom-l { text-transform:uppercase;letter-spacing:.08em;flex-shrink:0; }
-
-/* Fast-forward */
-.ff-panel { border-radius:8px;border:0.5px solid var(--b2);background:var(--bg2);padding:10px 12px;margin-bottom:9px; }
-.ff-title { font-size:9px;color:var(--t2);font-family:var(--m);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px; }
-.ff-input { width:100%;border-radius:6px;padding:7px 9px;border:0.5px solid var(--b2);background:var(--bg3);font-size:11px;color:var(--t);font-family:var(--f);outline:none;margin-bottom:6px; }
-.ff-input::placeholder { color:var(--t3); }
-.ff-input:focus { border-color:rgba(255,255,255,.18); }
-.ff-btns { display:flex;gap:5px; }
-.ff-btn { border-radius:6px;padding:6px 10px;border:0.5px solid var(--b2);background:var(--bg3);font-size:10px;font-family:var(--m);color:var(--t2);cursor:pointer;white-space:nowrap;transition:color .1s; }
-.ff-btn:hover { color:var(--t); }
-.ff-progress { font-size:9px;color:var(--t3);font-family:var(--m);margin-top:5px;min-height:14px; }
-
-.ev-l { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px; }
-.evgrid { display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:6px; }
-.evbtn { border-radius:6px;padding:6px 4px;border:0.5px solid var(--b2);background:var(--bg2);font-size:10px;font-family:var(--f);color:var(--t2);cursor:pointer;text-align:center;line-height:1.3;transition:background .1s,color .1s; }
-.evbtn:hover { background:var(--bg3);color:var(--t); }
-
-.custom-row { display:flex;gap:5px;margin-bottom:11px; }
-.custom-row input { flex:1;border-radius:6px;padding:6px 9px;border:0.5px solid var(--b2);background:var(--bg2);font-size:11px;color:var(--t);font-family:var(--f);outline:none; }
-.custom-row input::placeholder { color:var(--t3); }
-.custom-row input:focus { border-color:rgba(255,255,255,.16); }
-.custom-row button { border-radius:6px;padding:6px 10px;border:0.5px solid var(--b2);background:var(--bg2);font-size:10px;font-family:var(--m);color:var(--t2);cursor:pointer;white-space:nowrap; }
-
-/* Temperament */
-.temp-grid { display:grid;grid-template-columns:1fr 1fr;gap:4px; }
-.tbar { border-radius:5px;padding:6px 8px;border:0.5px solid var(--b);background:var(--bg2); }
-.tbar-label { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1px; }
-.tbar-name { font-size:10px;color:var(--t);margin-bottom:3px; }
-.tbar-track { height:3px;border-radius:2px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:3px; }
-.tbar-fill { height:100%;border-radius:2px;transition:width .6s; }
-.tbar-desc { font-size:9px;color:var(--t3);font-style:italic;font-family:var(--m); }
-.custom-row button:hover { color:var(--t); }
-
-.stream-l { font-size:9px;color:var(--t3);font-family:var(--m);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px; }
-.thought-stream { border-radius:8px;border:0.5px solid var(--b);background:var(--bg2);padding:12px;min-height:130px;max-height:320px;overflow-y:auto; }
-.thought-stream::-webkit-scrollbar { width:2px; }
-.thought-stream::-webkit-scrollbar-thumb { background:var(--b2);border-radius:2px; }
-.thought { padding:4px 0;border-bottom:0.5px solid var(--b);font-size:12px;line-height:1.75;color:var(--t);display:flex;align-items:baseline;gap:7px; }
-.thought:last-child { border-bottom:none; }
-.thought .ts { font-size:9px;color:var(--t3);font-family:var(--m);flex-shrink:0;min-width:34px; }
-.thought .tx { flex:1; }
-.thought.nv .tx { color:var(--t3);font-style:italic;font-size:10px; }
-.thought.rum .tx { color:var(--t2); }
-.thought.mem .tx { color:#7a6a4a;font-style:italic; }
-.thought.tom .tx { color:#4a6a7a; }
-.thought.need .tx { color:#5a4a7a; }
-.thought.sem .tx { color:#4a7a5a; }
-.thought .dtag { font-size:8px;font-family:var(--m);border-radius:3px;padding:1px 4px;opacity:.5;flex-shrink:0; }
+/* Fast Forward */
+.ff-panel { background:var(--panel); padding:20px; border-radius:16px; margin-bottom:40px; border:1px solid var(--border); }
+.ff-input { width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); color:white; padding:10px 0; margin-bottom:15px; font-size:14px; outline:none; }
 </style>
-
 </head>
 <body>
 
 <div class="header">
-<div class="avatar" id="av">🧍</div>
-<div style="flex:1">
-<div class="mind-label">The Mind</div>
-<div class="mind-status" id="status">pre-verbal — no concepts formed yet</div>
-</div>
-<button class="hbtn" onclick="resetMind()">reset</button>
+  <div class="avatar" id="av">🧍</div>
+  <div class="mind-status" id="status">Observing...</div>
+  <div class="mind-sub" id="dev-stage">Initial State</div>
 </div>
 
-<!-- FAST FORWARD -->
-
-<div class="ff-panel">
-<div class="ff-title">Fast-forward — describe a period of life</div>
-<textarea class="ff-input" id="ff-input" rows="2" placeholder="e.g. 'warm childhood, loving mother, safe home, some conflict, school, one close friend, moved once at age 7'"></textarea>
-<div class="ff-btns">
-<button class="ff-btn" onclick="fastForward()">Run ↗</button>
-<button class="ff-btn" onclick="fastForwardPreset('safe')">Safe childhood</button>
-<button class="ff-btn" onclick="fastForwardPreset('hard')">Difficult childhood</button>
-<button class="ff-btn" onclick="fastForwardPreset('mixed')">Mixed</button>
-</div>
-<div class="ff-progress" id="ff-progress"></div>
+<div class="stream-label">Thought Stream</div>
+<div class="thought-stream" id="stream">
+  <div class="thought nv"><span class="ts">—</span><span class="tx">Beginning of awareness...</span></div>
 </div>
 
-<!-- SEMANTIC NETWORK -->
-
-<div class="panel" id="cg-panel">
-<div class="panel-title">
-<span>Caregiver <span style="font-style:italic;opacity:.5">her state right now</span></span>
-<span class="ptog" onclick="togglePanel('cg-panel','cg-body')">▾</span>
-</div>
-<div id="cg-body">
-<div class="temp-grid" id="cg-grid"></div>
-<div style="margin-top:6px;font-size:9px;color:var(--t3);font-family:var(--m)" id="cg-iwm">attachment forming...</div>
-</div>
-</div>
-
-<div class="panel" id="temp-panel">
-<div class="panel-title">
-<span>Temperament <span style="font-style:italic;opacity:.5">constitutional · set at birth</span></span>
-<span class="ptog" onclick="togglePanel('temp-panel','temp-body')">▾</span>
-</div>
-<div id="temp-body">
-<div class="temp-grid" id="temp-grid"></div>
-</div>
-</div>
-
-<div class="panel" id="sem-panel">
-<div class="panel-title">
-<span>Semantic network <span id="sem-count" style="color:var(--t3);margin-left:6px;font-style:italic">— 65 primes + 20 molecules</span></span>
-<span class="ptog" onclick="togglePanel('sem-panel','sem-body')">▾</span>
-</div>
-<div id="sem-body">
-<div style="font-size:9px;color:var(--t3);font-family:var(--m);margin-bottom:5px;">Active nodes (brighter = more activated)</div>
-<div class="sem-grid" id="sem-grid"></div>
-<div style="font-size:9px;color:var(--t3);font-family:var(--m);margin-top:6px;" id="sem-plasticity"></div>
-</div>
-</div>
-
-<!-- NEEDS -->
-
-<div class="panel" id="needs-panel">
-<div class="panel-title">
-<span>Psychological needs</span>
-<span class="ptog" onclick="togglePanel('needs-panel','needs-body')">▾</span>
-</div>
-<div id="needs-body">
-<div class="need-row" id="need-row"></div>
-</div>
-</div>
-
-<!-- EPISODIC MEMORY -->
-
-<div class="panel" id="mem-panel">
-<div class="panel-title">
-<span>Episodic memory <span id="mem-count" style="color:var(--t3);margin-left:6px">— empty</span></span>
-<span class="ptog" onclick="togglePanel('mem-panel','mem-body')">▾</span>
-</div>
-<div id="mem-body">
-<div class="mem-list" id="mem-list"><div style="font-size:10px;color:var(--t3);font-family:var(--m)">no memories yet</div></div>
-</div>
-</div>
-
-<!-- CORE BELIEFS -->
-
-<div class="panel" id="schema-panel">
-<div class="panel-title">
-<span>Core beliefs <span id="schema-age" style="color:var(--t3);margin-left:6px;font-style:italic">— forming</span></span>
-<span class="ptog" onclick="togglePanel('schema-panel','schema-body')">▾</span>
-</div>
-<div id="schema-body">
-<div class="schema-grid" id="schema-grid"></div>
-</div>
-</div>
-
-<div class="state-row">
-<div class="scard"><div class="sc-l">State</div><div class="sc-v" id="dn">Neutral</div><div class="sc-s" id="ds">—</div></div>
-<div class="scard"><div class="sc-l">Blend</div><div class="sc-v" id="bn">—</div><div class="sc-s" id="bs">—</div></div>
-<div class="scard"><div class="sc-l">Trend</div><div class="sc-v" id="tv">→ stable</div><div class="sc-s" id="ts2">—</div></div>
-<div class="scard"><div class="sc-l">Age</div><div class="sc-v" id="dev-stage">Pre-verbal</div><div class="sc-s" id="dev-plasticity">—</div></div>
-</div>
-
-<div class="egrid" id="egrid"></div>
-
-<div class="def-row">
-<div class="def-l">Defense</div>
-<div class="def-n" id="defn">none</div>
-<div class="def-d" id="defd"></div>
-<div class="def-d" id="def-style" style="margin-left:auto;opacity:.6"></div>
-</div>
-
-<div class="tom-row">
-<span class="tom-l">ToM</span>
-<span style="color:var(--t2);font-style:italic;font-size:10px;" id="tom-display">no social event yet</span>
-</div>
-
-<div class="ev-l">Stimulus</div>
+<div class="section-label">Interact with the Environment</div>
 <div class="evgrid" id="evgrid"></div>
 <div class="custom-row">
-<input type="text" id="ci" placeholder="what happens to this person…" />
-<button onclick="sendCustom()">apply ↗</button>
+  <input type="text" id="ci" placeholder="Describe a specific event..." />
+  <button onclick="sendCustom()">Apply</button>
 </div>
 
-<div class="stream-l">Inner thought stream</div>
-<div class="thought-stream" id="stream">
-<div class="thought nv"><span class="ts">—</span><span class="tx">pre-verbal. no concepts yet. only sensation.</span></div>
+<div class="ff-panel">
+  <div class="section-label">Fast Forward Development</div>
+  <input class="ff-input" id="ff-input" placeholder="e.g. 'difficult childhood, moved often, safe school'" />
+  <div style="display:flex; gap:10px; justify-content:center;">
+    <button class="evbtn" onclick="fastForward()">Process History</button>
+    <button class="evbtn" onclick="resetMind()" style="color:#a84040">Reset Identity</button>
+  </div>
+  <div id="ff-progress" style="font-size:10px; color:var(--v-dim); text-align:center; margin-top:10px;"></div>
 </div>
+
+<div class="vitals-area">
+  <div class="section-label">Internal Systems (Technical)</div>
+  
+  <div class="panel" id="p-vitals">
+    <div class="panel-title" onclick="togglePanel('p-vitals','b-vitals')"><span>Current State & Body</span> <span>+</span></div>
+    <div class="panel-body" id="b-vitals" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+        <div class="stat-card"><div class="stat-label">Emotion</div><div id="ds">Neutral</div></div>
+        <div class="stat-card"><div class="stat-label">Trend</div><div id="tv">Stable</div></div>
+        <div class="stat-card"><div class="stat-label">Physical</div><div id="dev-plasticity">Awake</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-care">
+    <div class="panel-title" onclick="togglePanel('p-care','b-care')"><span>Attachment & Caregiver</span> <span>+</span></div>
+    <div class="panel-body" id="b-care">
+        <div id="cg-iwm" style="font-size:13px; margin-bottom:10px;"></div>
+        <div class="grid-2" id="cg-grid"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="p-temp">
+    <div class="panel-title" onclick="togglePanel('p-temp','b-temp')"><span>Temperament (DNA)</span> <span>+</span></div>
+    <div class="panel-body" id="b-temp"><div class="grid-2" id="temp-grid"></div></div>
+  </div>
+
+  <div class="panel" id="p-core">
+    <div class="panel-title" onclick="togglePanel('p-core','b-core')"><span>Core Beliefs (Schemas)</span> <span>+</span></div>
+    <div class="panel-body" id="b-core"><div class="grid-2" id="schema-grid"></div></div>
+  </div>
+</div>
+
+<!-- Hidden Technical Grids for rendering logic -->
+<div id="egrid" style="display:none"></div>
+<div id="sem-grid" style="display:none"></div>
+<div id="mem-list" style="display:none"></div>
+<div id="dn" style="display:none"></div>
+<div id="bn" style="display:none"></div>
+<div id="bs" style="display:none"></div>
+<div id="ts2" style="display:none"></div>
+<div id="defn" style="display:none"></div>
+<div id="defd" style="display:none"></div>
+<div id="def-style" style="display:none"></div>
+<div id="tom-display" style="display:none"></div>
+<div id="sem-count" style="display:none"></div>
+<div id="sem-plasticity" style="display:none"></div>
+<div id="schema-age" style="display:none"></div>
+<div id="need-row" style="display:none"></div>
+<div id="mem-count" style="display:none"></div>
 
 <script src="js/01-primes.js"></script>
-
 <script src="js/02-network.js"></script>
-
 <script src="js/03-temperament.js"></script>
-
 <script src="js/04-emotions.js"></script>
-
 <script src="js/05-caregiver.js"></script>
-
 <script src="js/06-schemas.js"></script>
-
 <script src="js/07-needs.js"></script>
-
 <script src="js/08-memory.js"></script>
-
 <script src="js/09-tom.js"></script>
-
 <script src="js/10-defense.js"></script>
-
 <script src="js/11-development.js"></script>
-
 <script src="js/12-thoughts.js"></script>
-
 <script src="js/13-events.js"></script>
-
 <script src="js/14-render.js"></script>
-
 <script src="js/16-body.js"></script>
-
 <script src="js/15-main.js"></script>
-
 </body>
 </html>
