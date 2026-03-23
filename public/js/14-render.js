@@ -31,7 +31,8 @@ function render(){
   setEl('dev-plasticity', 
     (BODY.isAsleep ? 'SLEEPING' : 'AWAKE') + ' · ' + 
     (BODY.fatigue > 70 ? 'Exhausted' : BODY.fatigue > 30 ? 'Tired' : 'Rested') + ' · ' +
-    HEARTBREAK.stage // ADD THIS HERE
+      `C:${Math.round(CHEM.cortisol*100)} O:${Math.round(CHEM.oxytocin*100)}`
+    ,HEARTBREAK.stage // ADD THIS HERE
   );
   // 3. Emotion Bars
   const egrid = document.getElementById('egrid');

@@ -26,5 +26,8 @@ function updateWindows() {
 
 // How much can a new event change the "Internal Working Model"?
 function getAttachmentPlasticity() {
-  return WINDOWS.attachment;
+  // Oxytocin (love/safety) keeps the brain plastic
+  // Even if the window is closing, high oxytocin allows for "Earned Security"
+  const safetyBonus = CHEM.oxytocin * 0.3;
+  return Math.min(1.0, WINDOWS.attachment + safetyBonus);
 }
